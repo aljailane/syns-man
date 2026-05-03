@@ -5,8 +5,31 @@ on:
     tags:
       - 'v*'
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   release-linux:
+    needs: create-release
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -31,6 +54,7 @@ jobs:
           npx electron-builder --linux AppImage deb rpm --x64 --publish always
 
   release-windows:
+    needs: create-release
     runs-on: windows-latest
     permissions:
       contents: write
