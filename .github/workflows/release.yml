@@ -6,24 +6,7 @@ on:
       - 'v*'
 
 jobs:
-  create-release:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          draft: false
-          prerelease: false
-          generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   release-linux:
-    needs: create-release
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -48,6 +31,10 @@ jobs:
       - name: Upload Linux artifacts
         uses: softprops/action-gh-release@v2
         with:
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          overwrite: true
           files: |
             dist/*.AppImage
             dist/*.deb
@@ -57,7 +44,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   release-windows:
-    needs: create-release
     runs-on: windows-latest
     permissions:
       contents: write
@@ -79,6 +65,10 @@ jobs:
       - name: Upload Windows artifacts
         uses: softprops/action-gh-release@v2
         with:
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          overwrite: true
           files: |
             dist/*.exe
             dist/*.blockmap

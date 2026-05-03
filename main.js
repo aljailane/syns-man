@@ -283,6 +283,14 @@ function setupAutoUpdater() {
       );
       return;
     }
+    if (message.includes("checksum") || message.includes("sha512")) {
+      setUpdateStatus(
+        "error",
+        "Download verification failed. Please try again later or download manually from GitHub.",
+        { currentVersion: app.getVersion() },
+      );
+      return;
+    }
     setUpdateStatus("error", `Updater error: ${message}`, {
       currentVersion: app.getVersion(),
     });
