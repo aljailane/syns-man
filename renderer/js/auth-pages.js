@@ -38,9 +38,13 @@ function authSettingsModalHTML() {
 
       <div class="form-group">
         <label class="form-label">Theme</label>
-        <div style="display:flex;gap:8px;">
-          <button type="button" class="btn btn-ghost" id="auth-stg-theme-dark" style="min-width:100px;justify-content:center;">Dark</button>
-          <button type="button" class="btn btn-ghost" id="auth-stg-theme-light" style="min-width:100px;justify-content:center;">Light</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button type="button" class="btn btn-ghost" id="auth-stg-theme-dark"   style="min-width:90px;justify-content:center;gap:6px;"><span style="width:10px;height:10px;border-radius:50%;background:#6366f1;display:inline-block;flex-shrink:0;"></span>Dark</button>
+          <button type="button" class="btn btn-ghost" id="auth-stg-theme-light"  style="min-width:90px;justify-content:center;gap:6px;"><span style="width:10px;height:10px;border-radius:50%;background:#94a3b8;display:inline-block;flex-shrink:0;"></span>Light</button>
+          <button type="button" class="btn btn-ghost" id="auth-stg-theme-ocean"  style="min-width:90px;justify-content:center;gap:6px;"><span style="width:10px;height:10px;border-radius:50%;background:#06b6d4;display:inline-block;flex-shrink:0;"></span>Ocean</button>
+          <button type="button" class="btn btn-ghost" id="auth-stg-theme-forest" style="min-width:90px;justify-content:center;gap:6px;"><span style="width:10px;height:10px;border-radius:50%;background:#22c55e;display:inline-block;flex-shrink:0;"></span>Forest</button>
+          <button type="button" class="btn btn-ghost" id="auth-stg-theme-violet" style="min-width:90px;justify-content:center;gap:6px;"><span style="width:10px;height:10px;border-radius:50%;background:#a855f7;display:inline-block;flex-shrink:0;"></span>Violet</button>
+          <button type="button" class="btn btn-ghost" id="auth-stg-theme-rose"   style="min-width:90px;justify-content:center;gap:6px;"><span style="width:10px;height:10px;border-radius:50%;background:#f43f5e;display:inline-block;flex-shrink:0;"></span>Rose</button>
         </div>
       </div>
 
@@ -230,10 +234,10 @@ function bindAuthSettingsEvents() {
       closeAuthSettingsModal();
   };
 
-  document.getElementById("auth-stg-theme-dark").onclick = () =>
-    setAuthTheme("dark");
-  document.getElementById("auth-stg-theme-light").onclick = () =>
-    setAuthTheme("light");
+  ["dark","light","ocean","forest","violet","rose"].forEach(t => {
+    const btn = document.getElementById(`auth-stg-theme-${t}`);
+    if (btn) btn.onclick = () => setAuthTheme(t);
+  });
   document.getElementById("auth-stg-proxy-enabled").onchange = () => {
     const on = document.getElementById("auth-stg-proxy-enabled").checked;
     document.getElementById("auth-proxy-fields").style.opacity = on
@@ -256,17 +260,14 @@ function closeAuthSettingsModal() {
 }
 
 function setAuthTheme(theme) {
-  const darkBtn = document.getElementById("auth-stg-theme-dark");
-  const lightBtn = document.getElementById("auth-stg-theme-light");
-  darkBtn.classList.toggle("btn-primary", theme === "dark");
-  darkBtn.classList.toggle("btn-ghost", theme !== "dark");
-  lightBtn.classList.toggle("btn-primary", theme === "light");
-  lightBtn.classList.toggle("btn-ghost", theme !== "light");
-
+  ["dark","light","ocean","forest","violet","rose"].forEach(t => {
+    const btn = document.getElementById(`auth-stg-theme-${t}`);
+    if (!btn) return;
+    btn.classList.toggle("btn-primary", t === theme);
+    btn.classList.toggle("btn-ghost",   t !== theme);
+  });
   document.documentElement.setAttribute("data-theme", theme);
-  try {
-    localStorage.setItem("syns-theme", theme);
-  } catch {}
+  try { localStorage.setItem("syns-theme", theme); } catch {}
 }
 
 function applyAuthSettingsToUI(s) {
