@@ -1,6 +1,6 @@
 {
   "name": "syns",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "SSH / SFTP Manager",
   "homepage": "https://github.com/aljailane/syns-man",
   "main": "main.js",
@@ -79,6 +79,18 @@
       "target": [
         {
           "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "rpm",
           "arch": [
             "x64"
           ]

@@ -8,6 +8,8 @@ on:
 jobs:
   release:
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
 
     strategy:
       matrix:
@@ -24,6 +26,10 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Install RPM tools (Linux only)
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get update && sudo apt-get install -y rpm
 
       - name: Build and Publish Electron app
         env:
