@@ -275,6 +275,14 @@ function setupAutoUpdater() {
 
   autoUpdater.on("error", (error) => {
     const message = error?.message || String(error);
+    if (message.includes("404") || message.includes("Not Found")) {
+      setUpdateStatus(
+        "up-to-date",
+        `You are on the latest version (${app.getVersion()})`,
+        { currentVersion: app.getVersion() },
+      );
+      return;
+    }
     setUpdateStatus("error", `Updater error: ${message}`, {
       currentVersion: app.getVersion(),
     });
