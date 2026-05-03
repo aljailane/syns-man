@@ -32,6 +32,7 @@ contextBridge.exposeInMainWorld("syns", {
   adminExists: () => ipcRenderer.invoke("admin:exists"),
   adminSetup: (data) => ipcRenderer.invoke("admin:setup", data),
   adminLogin: (data) => ipcRenderer.invoke("admin:login", data),
+  adminReset: () => ipcRenderer.invoke("admin:reset"),
 
   // Servers
   serversList: () => ipcRenderer.invoke("servers:list"),

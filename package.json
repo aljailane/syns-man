@@ -1,8 +1,12 @@
 {
   "name": "syns",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "SSH / SFTP Manager",
   "homepage": "https://github.com/aljailane/syns-man",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aljailane/syns-man.git"
+  },
   "main": "main.js",
   "scripts": {
     "start": "electron .",

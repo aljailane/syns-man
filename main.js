@@ -52,8 +52,8 @@ async function checkForUpdates(source = "manual") {
       currentVersion: app.getVersion(),
     });
     return {
-      ok: false,
-      error: "Auto-update works only in packaged builds.",
+      ok: true,
+      error: null,
       state: getUpdateState(),
     };
   }
@@ -71,6 +71,15 @@ async function checkForUpdates(source = "manual") {
     };
   } catch (error) {
     const message = error?.message || String(error);
+    
+    if (message.includes("404") || message.includes("Not Found")) {
+      setUpdateStatus("up-to-date", "No updates available (No release found).", {
+        source,
+        currentVersion: app.getVersion(),
+      });
+      return { ok: true, updateInfo: null, state: getUpdateState() };
+    }
+
     setUpdateStatus("error", `Update check failed: ${message}`, {
       source,
       currentVersion: app.getVersion(),

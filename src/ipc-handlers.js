@@ -27,6 +27,18 @@ function registerHandlers() {
     return match ? { ok: true } : { ok: false, error: 'Invalid credentials' };
   });
 
+  ipcMain.handle('admin:reset', () => {
+    setAdmin(null);
+    setServers([]);
+    return { ok: true };
+  });
+
+  ipcMain.handle('admin:reset', () => {
+    setAdmin(null);
+    setServers([]);
+    return { ok: true };
+  });
+
   // ── Servers ────────────────────────────────────────
   ipcMain.handle('servers:list', () => {
     return getServers().sort((a, b) => a.name.localeCompare(b.name));

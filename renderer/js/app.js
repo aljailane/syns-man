@@ -600,9 +600,6 @@ function bindLoginForm() {
       btn.textContent = "Signing in…";
 
       const res = await window.syns.adminLogin({ username, password });
-      if (res.ok) {
-        saveSession();
-        loadPersistentData();
         enterApp();
       } else {
         showAlert("login-alert", res.error, "error");
@@ -610,6 +607,15 @@ function bindLoginForm() {
         btn.textContent = "Sign In";
       }
     });
+
+  document.getElementById("reset-password-link")?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    const confirmed = confirm("هل أنت متأكد من إعادة تعيين كلمة المرور؟ سيتم مسح جميع البيانات والخوادم المحفوظة.");
+    if (confirmed) {
+      await window.syns.adminReset();
+      window.location.reload();
+    }
+  });
 }
 
 function enterApp(silent) {
