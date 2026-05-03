@@ -1865,6 +1865,41 @@ body.cards-expanded .server-icon {
     font-family: "Consolas", monospace;
 }
 
+/* Update notification banner */
+.about-update-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 14px 0;
+    padding: 12px 16px;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--accent) 12%, var(--bg2));
+    border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    color: var(--accent);
+    font-size: 14px;
+    font-weight: 500;
+    animation: bannerSlideIn 0.25s ease;
+}
+.about-update-banner svg { flex-shrink: 0; }
+.about-update-banner-msg { flex: 1; }
+.about-update-banner-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.about-update-banner .btn-sm {
+    padding: 4px 12px;
+    font-size: 12px;
+    height: 28px;
+}
+/* downloaded state → green */
+.about-update-banner.is-ready {
+    background: color-mix(in srgb, #00b894 12%, var(--bg2));
+    border-color: color-mix(in srgb, #00b894 40%, transparent);
+    color: #00b894;
+}
+@keyframes bannerSlideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+
 .about-dev-name {
     font-size: 15px;
     font-weight: 700;

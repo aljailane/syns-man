@@ -2222,6 +2222,33 @@ function renderAboutUpdateState() {
     installBtn.disabled = stage !== "downloaded";
     if (stage !== "installing") installBtn.classList.remove("is-loading");
   }
+
+  // --- Update notification banner ---
+  const banner = document.getElementById("about-update-banner");
+  const bannerMsg = document.getElementById("about-update-banner-msg");
+  const bannerInstall = document.getElementById("btn-banner-install");
+  const bannerCheck = document.getElementById("btn-banner-check");
+  const bannerRepo = document.getElementById("btn-banner-repo");
+
+  const showBanner = ["available", "downloaded"].includes(stage);
+  if (banner) {
+    banner.style.display = showBanner ? "flex" : "none";
+    banner.classList.toggle("is-ready", stage === "downloaded");
+  }
+
+  if (showBanner && bannerMsg) {
+    const ver = status.updateInfo?.version ? ` (v${status.updateInfo.version})` : "";
+    if (stage === "downloaded") {
+      bannerMsg.textContent = `Version${ver} is downloaded and ready to install — restart to apply.`;
+    } else {
+      bannerMsg.textContent = `New update available${ver}! Click to download.`;
+    }
+  }
+
+  // Banner buttons: show correct action per platform/stage
+  if (bannerInstall) bannerInstall.style.display = (!isLinux && stage === "downloaded") ? "inline-flex" : "none";
+  if (bannerCheck)   bannerCheck.style.display   = (!isLinux && stage === "available")  ? "inline-flex" : "none";
+  if (bannerRepo)    bannerRepo.style.display     = (isLinux  && showBanner)             ? "inline-flex" : "none";
 }
 
 function applySmartUpdateActions() {
@@ -2383,6 +2410,17 @@ function initAboutPage() {
     ?.addEventListener("click", requestUpdateInstall);
   document
     .getElementById("btn-repo-update")
+    ?.addEventListener("click", requestRepositoryUpdate);
+
+  // Banner buttons
+  document
+    .getElementById("btn-banner-install")
+    ?.addEventListener("click", requestUpdateInstall);
+  document
+    .getElementById("btn-banner-check")
+    ?.addEventListener("click", requestUpdateCheck);
+  document
+    .getElementById("btn-banner-repo")
     ?.addEventListener("click", requestRepositoryUpdate);
 
   document.querySelectorAll(".about-link[data-ext]").forEach((a) => {
