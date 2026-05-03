@@ -28,22 +28,6 @@ All credentials are stored in an encrypted local SQLite database — nothing lea
 
 ---
 
-## Screenshots
-
-> Replace the SVG placeholders below with actual `.png` screenshots after first launch.  
-> Place them at `docs/screenshots/` with the same filenames.
-
-### Dashboard
-<img src="docs/screenshots/dashboard.svg" alt="Dashboard view" width="100%"/>
-
-### SFTP File Browser
-<img src="docs/screenshots/sftp.svg" alt="SFTP browser" width="100%"/>
-
-### SSH Terminal
-<img src="docs/screenshots/terminal.svg" alt="SSH terminal" width="100%"/>
-
----
-
 ## Features
 
 | Feature | Description |
