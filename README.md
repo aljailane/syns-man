@@ -1,7 +1,7 @@
 # SYNS Man
 
 <p align="center">
-  <img src="docs/screenshots/Screenshot%20From%202026-05-03%2022-13-29.png" alt="SYNS Man — Dashboard" width="100%"/>
+  <img src="docs/screenshots/servers.png" alt="SYNS Man — Servers" width="100%"/>
 </p>
 
 <p align="center">
@@ -25,6 +25,15 @@ Whether you are a developer deploying code to a remote server, a sysadmin managi
 - **Save connection profiles** locally so you never retype credentials
 
 All credentials are stored in an encrypted local SQLite database — nothing leaves your device.
+
+---
+
+## Screenshots
+
+### Servers — Connection Manager
+<img src="docs/screenshots/servers.png" alt="Servers view" width="100%"/>
+
+> Add more screenshots to `docs/screenshots/` (e.g. `sftp.png`, `terminal.png`) and link them here.
 
 ---
 
