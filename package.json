@@ -23,7 +23,7 @@
   },
   "keywords": [],
   "author": "SYNS Man",
-  "license": "ISC",
+  "license": "MIT",
   "type": "commonjs",
   "build": {
     "appId": "com.syns.app",
