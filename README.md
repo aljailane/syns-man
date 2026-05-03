@@ -1,7 +1,7 @@
 # SYNS Man
 
 <p align="center">
-  <img src="docs/screenshots/dashboard.svg" alt="SYNS Man — Dashboard" width="100%"/>
+  <img src="docs/screenshots/Screenshot%20From%202026-05-03%2022-13-29.png" alt="SYNS Man — Dashboard" width="100%"/>
 </p>
 
 <p align="center">
