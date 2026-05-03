@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain, dialog, screen } = require("electron");
 const path = require("path");
+const https = require("https");
 const { autoUpdater } = require("electron-updater");
 const { registerHandlers } = require("./src/ipc-handlers");
 
@@ -13,6 +14,41 @@ let lastUpdateStatus = {
 };
 let lastUpdateProgress = null;
 let updateCheckInFlight = null;
+
+function fetchLatestGitHubRelease() {
+  return new Promise((resolve, reject) => {
+    const options = {
+      hostname: "api.github.com",
+      path: "/repos/aljailane/syns-man/releases/latest",
+      headers: { "User-Agent": "syns-man-updater/1.0" },
+    };
+    https
+      .get(options, (res) => {
+        let data = "";
+        res.on("data", (chunk) => (data += chunk));
+        res.on("end", () => {
+          try {
+            resolve(JSON.parse(data));
+          } catch (e) {
+            reject(e);
+          }
+        });
+      })
+      .on("error", reject);
+  });
+}
+
+function compareVersions(a, b) {
+  const pa = a.replace(/^v/, "").split(".").map(Number);
+  const pb = b.replace(/^v/, "").split(".").map(Number);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const na = pa[i] || 0;
+    const nb = pb[i] || 0;
+    if (na > nb) return 1;
+    if (na < nb) return -1;
+  }
+  return 0;
+}
 
 function getUpdateSupportState() {
   if (!app.isPackaged) {
@@ -65,22 +101,76 @@ function getUpdateState() {
   };
 }
 
-async function checkForUpdates(source = "manual") {
-  const support = getUpdateSupportState();
-  if (!support.enabled) {
-    setUpdateStatus(support.stage, support.reason, {
+async function checkVersionViaGitHub(source) {
+  setUpdateStatus("checking", "Checking for updates...", {
+    source,
+    currentVersion: app.getVersion(),
+  });
+  try {
+    const release = await fetchLatestGitHubRelease();
+    const latestVersion = (release?.tag_name || "").replace(/^v/, "");
+    const currentVersion = app.getVersion();
+    if (!latestVersion) {
+      setUpdateStatus("up-to-date", "Could not determine latest version.", {
+        source,
+        currentVersion,
+      });
+      return { ok: true, updateInfo: null, state: getUpdateState() };
+    }
+    if (compareVersions(latestVersion, currentVersion) > 0) {
+      setUpdateStatus(
+        "available",
+        `New version v${latestVersion} is available!`,
+        {
+          source,
+          currentVersion,
+          updateInfo: { version: latestVersion, releaseUrl: release.html_url },
+        },
+      );
+    } else {
+      setUpdateStatus(
+        "up-to-date",
+        `You are on the latest version (${currentVersion})`,
+        { source, currentVersion, updateInfo: { version: latestVersion } },
+      );
+    }
+    return {
+      ok: true,
+      updateInfo: { version: latestVersion },
+      state: getUpdateState(),
+    };
+  } catch (error) {
+    const message = error?.message || String(error);
+    setUpdateStatus("error", `Update check failed: ${message}`, {
       source,
       currentVersion: app.getVersion(),
     });
-    return {
-      ok: true,
-      error: null,
-      state: getUpdateState(),
-    };
+    return { ok: false, error: message, state: getUpdateState() };
+  }
+}
+
+async function checkForUpdates(source = "manual") {
+  if (!app.isPackaged) {
+    setUpdateStatus("disabled", "Auto-update is disabled in development mode", {
+      source,
+      currentVersion: app.getVersion(),
+    });
+    return { ok: true, error: null, state: getUpdateState() };
   }
 
   if (updateCheckInFlight) return updateCheckInFlight;
 
+  // Non-Windows: version check via GitHub API only (no auto-download)
+  if (process.platform !== "win32") {
+    updateCheckInFlight = checkVersionViaGitHub(source);
+    try {
+      return await updateCheckInFlight;
+    } finally {
+      updateCheckInFlight = null;
+    }
+  }
+
+  // Windows: use electron-updater (auto-download + install)
   updateCheckInFlight = (async () => {
     try {
       setUpdateStatus("checking", "Checking for updates...", {
@@ -95,15 +185,14 @@ async function checkForUpdates(source = "manual") {
       };
     } catch (error) {
       const message = error?.message || String(error);
-
       if (message.includes("404") || message.includes("Not Found")) {
-        setUpdateStatus("up-to-date", "No updates available (No release found).", {
-          source,
-          currentVersion: app.getVersion(),
-        });
+        setUpdateStatus(
+          "up-to-date",
+          "No updates available (No release found).",
+          { source, currentVersion: app.getVersion() },
+        );
         return { ok: true, updateInfo: null, state: getUpdateState() };
       }
-
       setUpdateStatus("error", `Update check failed: ${message}`, {
         source,
         currentVersion: app.getVersion(),
@@ -120,16 +209,10 @@ async function checkForUpdates(source = "manual") {
 }
 
 function setupAutoUpdater() {
-  const support = getUpdateSupportState();
-  if (!support.enabled) {
-    setUpdateStatus(support.stage, support.reason, {
-      currentVersion: app.getVersion(),
-    });
-    return;
-  }
-
-  autoUpdater.autoDownload = true;
-  autoUpdater.autoInstallOnAppQuit = true;
+  // Windows only: set up electron-updater events (auto-download & install)
+  if (app.isPackaged && process.platform === "win32") {
+    autoUpdater.autoDownload = true;
+    autoUpdater.autoInstallOnAppQuit = true;
 
   autoUpdater.on("checking-for-update", () => {
     setUpdateStatus("checking", "Checking for updates...", {
@@ -196,10 +279,22 @@ function setupAutoUpdater() {
       currentVersion: app.getVersion(),
     });
   });
+  } else {
+    setUpdateStatus(
+      app.isPackaged ? "idle" : "disabled",
+      app.isPackaged
+        ? "Update service ready"
+        : "Auto-update is disabled in development mode",
+      { currentVersion: app.getVersion() },
+    );
+  }
 
-  setTimeout(() => {
-    checkForUpdates("startup").catch(() => {});
-  }, UPDATE_STARTUP_DELAY_MS);
+  // Startup check runs for ALL platforms when packaged
+  if (app.isPackaged) {
+    setTimeout(() => {
+      checkForUpdates("startup").catch(() => {});
+    }, UPDATE_STARTUP_DELAY_MS);
+  }
 }
 
 function createWindow() {

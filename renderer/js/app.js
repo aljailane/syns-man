@@ -623,6 +623,7 @@ function enterApp(silent) {
   document.getElementById("auth-root").style.display = "none";
   document.getElementById("main-shell").style.display = "flex";
   if (silent) showSftpToast("✅ Session restored");
+  initGlobalUpdateListener();
   loadDashboard();
 }
 
@@ -1563,14 +1564,14 @@ function hideSftpOpBar() {
 }
 
 let _toastTimer = null;
-function showSftpToast(msg) {
+function showSftpToast(msg, duration = 3000) {
   const el = document.getElementById("sftp-toast");
   el.textContent = msg;
   el.style.opacity = "1";
   clearTimeout(_toastTimer);
   _toastTimer = setTimeout(() => {
     el.style.opacity = "0";
-  }, 3000);
+  }, duration);
 }
 
 /* ─── Chmod ──────────────────────────────────────────────────────────── */
@@ -2260,7 +2261,8 @@ function applySmartUpdateActions() {
   const installBtn = document.getElementById("btn-install-update");
   const repoBtn = document.getElementById("btn-repo-update");
 
-  if (checkBtn) checkBtn.style.display = isWindows ? "inline-flex" : "none";
+  // Check for updates button: visible on ALL platforms
+  if (checkBtn) checkBtn.style.display = "inline-flex";
   if (installBtn) installBtn.style.display = isWindows ? "inline-flex" : "none";
   if (repoBtn) repoBtn.style.display = isLinux ? "inline-flex" : "none";
 }
@@ -2444,6 +2446,44 @@ function initAboutPage() {
       if (panel) panel.classList.add("active");
     });
   });
+}
+
+/* ─── Global update listener ─────────────────────────────────────────── */
+let _globalUpdateNotifShown = false;
+
+function initGlobalUpdateListener() {
+  if (_globalUpdateNotifShown !== false && _globalUpdateNotifShown !== undefined) return;
+  // Reset per-login session
+  _globalUpdateNotifShown = false;
+
+  function handleUpdateStatus(status) {
+    const stage = status?.stage;
+    if (_globalUpdateNotifShown) return;
+    if (stage !== "available" && stage !== "downloaded") return;
+    _globalUpdateNotifShown = true;
+    const ver = status.updateInfo?.version ? ` v${status.updateInfo.version}` : "";
+    const isLinux = window.syns.platform === "linux";
+    const action = isLinux ? "View Releases in About page" : "Go to About page to install";
+    const msg =
+      stage === "downloaded"
+        ? `🔄 Update${ver} ready — restart to install`
+        : `⬆️ New update${ver} available — ${action}`;
+    showSftpToast(msg, 7000);
+  }
+
+  if (window.syns.onUpdateStatus) {
+    window.syns.onUpdateStatus(handleUpdateStatus);
+  }
+
+  // Check current state immediately (update may already be found)
+  if (window.syns.updateGetState) {
+    window.syns
+      .updateGetState()
+      .then((state) => {
+        if (state?.status) handleUpdateStatus(state.status);
+      })
+      .catch(() => {});
+  }
 }
 
 /* ─── Boot ───────────────────────────────────────────────────────────── */
