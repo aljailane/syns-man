@@ -588,6 +588,13 @@ function bindSetupForm() {
 }
 
 function bindLoginForm() {
+  // "change" link to clear saved username
+  document.getElementById("auth-clear-user")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    try { localStorage.removeItem("syns_last_username"); } catch {}
+    showAuthPage("login");
+  });
+
   document
     .getElementById("login-form")
     .addEventListener("submit", async (e) => {
@@ -601,6 +608,8 @@ function bindLoginForm() {
 
       const res = await window.syns.adminLogin({ username, password });
       if (res.ok) {
+        try { localStorage.setItem("syns_last_username", username); } catch {}
+        saveSession();
         enterApp();
       } else {
         showAlert("login-alert", res.error, "error");
@@ -2239,32 +2248,23 @@ function renderAboutUpdateState() {
 
   if (showBanner && bannerMsg) {
     const ver = status.updateInfo?.version ? ` (v${status.updateInfo.version})` : "";
-    if (stage === "downloaded") {
-      bannerMsg.textContent = `Version${ver} is downloaded and ready to install — restart to apply.`;
-    } else {
-      bannerMsg.textContent = `New update available${ver}! Click to download.`;
-    }
+    bannerMsg.textContent = `New update available${ver}! Visit GitHub Releases to download.`;
   }
 
-  // Banner buttons: show correct action per platform/stage
-  if (bannerInstall) bannerInstall.style.display = (!isLinux && stage === "downloaded") ? "inline-flex" : "none";
-  if (bannerCheck)   bannerCheck.style.display   = (!isLinux && stage === "available")  ? "inline-flex" : "none";
-  if (bannerRepo)    bannerRepo.style.display     = (isLinux  && showBanner)             ? "inline-flex" : "none";
+  // Banner buttons: show "Go to Releases" for all platforms when update available
+  if (bannerInstall) bannerInstall.style.display = "none";
+  if (bannerCheck)   bannerCheck.style.display   = "none";
+  if (bannerRepo)    bannerRepo.style.display     = showBanner ? "inline-flex" : "none";
 }
 
 function applySmartUpdateActions() {
-  const platform = window.syns.platform;
-  const isWindows = platform === "win32";
-  const isLinux = platform === "linux";
-
   const checkBtn = document.getElementById("btn-check-update");
   const installBtn = document.getElementById("btn-install-update");
   const repoBtn = document.getElementById("btn-repo-update");
 
-  // Check for updates button: visible on ALL platforms
   if (checkBtn) checkBtn.style.display = "inline-flex";
-  if (installBtn) installBtn.style.display = isWindows ? "inline-flex" : "none";
-  if (repoBtn) repoBtn.style.display = isLinux ? "inline-flex" : "none";
+  if (installBtn) installBtn.style.display = "none";
+  if (repoBtn) repoBtn.style.display = "inline-flex";
 }
 
 function bindAboutUpdateRealtime() {

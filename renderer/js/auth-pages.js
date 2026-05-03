@@ -146,6 +146,9 @@ function setupPageHTML() {
 
 function loginPageHTML() {
   const appVer = getAuthAppVersion();
+  let savedUsername = "";
+  try { savedUsername = localStorage.getItem("syns_last_username") || ""; } catch {}
+  const hasSavedUser = !!savedUsername;
   return `
   <div class="auth-wrap">
     <div class="auth-top-meta">
@@ -176,7 +179,11 @@ function loginPageHTML() {
       <form id="login-form">
         <div class="form-group">
           <label class="form-label">Username</label>
-          <input class="form-input" id="login-username" placeholder="admin" autocomplete="off" required/>
+          <input class="form-input${hasSavedUser ? " auth-prefilled" : ""}" id="login-username" placeholder="admin" autocomplete="off" required value="${savedUsername.replace(/"/g, '&quot;')}"/>
+          ${hasSavedUser ? `<div style="font-size:11px;color:var(--text2);margin-top:4px;display:flex;align-items:center;gap:4px;">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V11H13V17ZM13 9H11V7H13V9Z" fill="currentColor"/></svg>
+            Last session: <b>${savedUsername.replace(/</g, '&lt;')}</b> — <a href="#" id="auth-clear-user" style="color:var(--accent);text-decoration:none;">change</a>
+          </div>` : ""}
         </div>
         <div class="form-group">
           <label class="form-label">Password</label>

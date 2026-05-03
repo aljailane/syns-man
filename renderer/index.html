@@ -487,63 +487,28 @@
                                                 Theme
                                             </div>
                                             <div class="settings-row-desc">
-                                                Choose between dark and light
-                                                mode
+                                                Choose your preferred color theme
                                             </div>
                                         </div>
                                         <div class="settings-row-control">
-                                            <div class="theme-switcher">
-                                                <button
-                                                    class="theme-opt"
-                                                    data-theme-opt="dark"
-                                                    id="stg-theme-dark"
-                                                    style="
-                                                        display: inline-flex;
-                                                        align-items: center;
-                                                        gap: 6px;
-                                                    "
-                                                >
-                                                    <svg
-                                                        width="14"
-                                                        height="14"
-                                                        viewBox="0 0 24 24"
-                                                        fill="none"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        aria-hidden="true"
-                                                    >
-                                                        <path
-                                                            d="M12.4 3.5C8.65 3.5 5.6 6.55 5.6 10.3C5.6 14.05 8.65 17.1 12.4 17.1C14.86 17.1 17.04 15.79 18.22 13.82C17.2 14.17 16.12 14.36 15.02 14.36C10.84 14.36 7.44 10.96 7.44 6.78C7.44 5.79 7.63 4.84 7.97 3.95C6.61 4.56 5.45 5.63 4.74 6.95C4.2 7.95 3.9 9.1 3.9 10.3C3.9 15 7.7 18.8 12.4 18.8C17.1 18.8 20.9 15 20.9 10.3C20.9 9.22 20.7 8.2 20.34 7.27C18.73 9.34 16.2 10.7 13.36 10.7C12.97 10.7 12.58 10.67 12.2 10.6V3.5H12.4Z"
-                                                            fill="currentColor"
-                                                        />
-                                                    </svg>
-                                                    Dark
+                                            <div class="theme-switcher" style="flex-wrap:wrap;gap:6px;">
+                                                <button class="theme-opt" data-theme-opt="dark" id="stg-theme-dark" style="display:inline-flex;align-items:center;gap:5px;">
+                                                    <span style="width:10px;height:10px;border-radius:50%;background:#4f8ef7;display:inline-block;"></span>Dark
                                                 </button>
-                                                <button
-                                                    class="theme-opt"
-                                                    data-theme-opt="light"
-                                                    id="stg-theme-light"
-                                                    style="
-                                                        display: inline-flex;
-                                                        align-items: center;
-                                                        gap: 6px;
-                                                    "
-                                                >
-                                                    <svg
-                                                        width="14"
-                                                        height="14"
-                                                        viewBox="0 0 24 24"
-                                                        fill="none"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        aria-hidden="true"
-                                                    >
-                                                        <path
-                                                            d="M12 6.3C8.85 6.3 6.3 8.85 6.3 12C6.3 15.15 8.85 17.7 12 17.7C15.15 17.7 17.7 15.15 17.7 12C17.7 8.85 15.15 6.3 12 6.3ZM12 3V4.8M12 19.2V21M3 12H4.8M19.2 12H21M5.1 5.1L6.4 6.4M17.6 17.6L18.9 18.9M18.9 5.1L17.6 6.4M6.4 17.6L5.1 18.9"
-                                                            stroke="currentColor"
-                                                            stroke-width="1.8"
-                                                            stroke-linecap="round"
-                                                        />
-                                                    </svg>
-                                                    Light
+                                                <button class="theme-opt" data-theme-opt="light" id="stg-theme-light" style="display:inline-flex;align-items:center;gap:5px;">
+                                                    <span style="width:10px;height:10px;border-radius:50%;background:#2563eb;display:inline-block;"></span>Light
+                                                </button>
+                                                <button class="theme-opt" data-theme-opt="ocean" id="stg-theme-ocean" style="display:inline-flex;align-items:center;gap:5px;">
+                                                    <span style="width:10px;height:10px;border-radius:50%;background:#06b6d4;display:inline-block;"></span>Ocean
+                                                </button>
+                                                <button class="theme-opt" data-theme-opt="forest" id="stg-theme-forest" style="display:inline-flex;align-items:center;gap:5px;">
+                                                    <span style="width:10px;height:10px;border-radius:50%;background:#22c55e;display:inline-block;"></span>Forest
+                                                </button>
+                                                <button class="theme-opt" data-theme-opt="violet" id="stg-theme-violet" style="display:inline-flex;align-items:center;gap:5px;">
+                                                    <span style="width:10px;height:10px;border-radius:50%;background:#a855f7;display:inline-block;"></span>Violet
+                                                </button>
+                                                <button class="theme-opt" data-theme-opt="rose" id="stg-theme-rose" style="display:inline-flex;align-items:center;gap:5px;">
+                                                    <span style="width:10px;height:10px;border-radius:50%;background:#f43f5e;display:inline-block;"></span>Rose
                                                 </button>
                                             </div>
                                         </div>
@@ -862,7 +827,7 @@
                                         <div class="about-version">
                                             Version
                                             <span id="about-version"
-                                                >1.0.11</span
+                                                >1.0.14</span
                                             >
                                             <span
                                                 class="about-build"

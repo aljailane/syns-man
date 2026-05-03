@@ -1,7 +1,6 @@
-const { app, BrowserWindow, ipcMain, dialog, screen } = require("electron");
+const { app, BrowserWindow, ipcMain, dialog, screen, shell } = require("electron");
 const path = require("path");
 const https = require("https");
-const { autoUpdater } = require("electron-updater");
 const { registerHandlers } = require("./src/ipc-handlers");
 
 let mainWindow;
@@ -56,14 +55,6 @@ function getUpdateSupportState() {
       enabled: false,
       stage: "disabled",
       reason: "Auto-update is disabled in development mode",
-    };
-  }
-
-  if (process.platform !== "win32") {
-    return {
-      enabled: false,
-      stage: "unsupported",
-      reason: "Auto-update is currently supported on Windows builds only",
     };
   }
 
@@ -160,47 +151,8 @@ async function checkForUpdates(source = "manual") {
 
   if (updateCheckInFlight) return updateCheckInFlight;
 
-  // Non-Windows: version check via GitHub API only (no auto-download)
-  if (process.platform !== "win32") {
-    updateCheckInFlight = checkVersionViaGitHub(source);
-    try {
-      return await updateCheckInFlight;
-    } finally {
-      updateCheckInFlight = null;
-    }
-  }
-
-  // Windows: use electron-updater (auto-download + install)
-  updateCheckInFlight = (async () => {
-    try {
-      setUpdateStatus("checking", "Checking for updates...", {
-        source,
-        currentVersion: app.getVersion(),
-      });
-      const result = await autoUpdater.checkForUpdates();
-      return {
-        ok: true,
-        updateInfo: result?.updateInfo || null,
-        state: getUpdateState(),
-      };
-    } catch (error) {
-      const message = error?.message || String(error);
-      if (message.includes("404") || message.includes("Not Found")) {
-        setUpdateStatus(
-          "up-to-date",
-          "No updates available (No release found).",
-          { source, currentVersion: app.getVersion() },
-        );
-        return { ok: true, updateInfo: null, state: getUpdateState() };
-      }
-      setUpdateStatus("error", `Update check failed: ${message}`, {
-        source,
-        currentVersion: app.getVersion(),
-      });
-      return { ok: false, error: message, state: getUpdateState() };
-    }
-  })();
-
+  // All platforms: version check via GitHub API only (notification, no auto-download)
+  updateCheckInFlight = checkVersionViaGitHub(source);
   try {
     return await updateCheckInFlight;
   } finally {
@@ -209,101 +161,13 @@ async function checkForUpdates(source = "manual") {
 }
 
 function setupAutoUpdater() {
-  // Windows only: set up electron-updater events (auto-download & install)
-  if (app.isPackaged && process.platform === "win32") {
-    autoUpdater.autoDownload = true;
-    autoUpdater.autoInstallOnAppQuit = true;
-
-  autoUpdater.on("checking-for-update", () => {
-    setUpdateStatus("checking", "Checking for updates...", {
-      currentVersion: app.getVersion(),
-    });
-  });
-
-  autoUpdater.on("update-available", (info) => {
-    setUpdateStatus(
-      "available",
-      `Update ${info?.version || ""} found. Downloading...`,
-      {
-        currentVersion: app.getVersion(),
-        updateInfo: info || null,
-      },
-    );
-  });
-
-  autoUpdater.on("update-not-available", (info) => {
-    setUpdateProgress(null);
-    setUpdateStatus(
-      "up-to-date",
-      `You are on the latest version (${app.getVersion()})`,
-      {
-        currentVersion: app.getVersion(),
-        updateInfo: info || null,
-      },
-    );
-  });
-
-  autoUpdater.on("download-progress", (progress) => {
-    const normalized = {
-      percent: Number(progress?.percent || 0),
-      bytesPerSecond: Number(progress?.bytesPerSecond || 0),
-      transferred: Number(progress?.transferred || 0),
-      total: Number(progress?.total || 0),
-      at: new Date().toISOString(),
-    };
-    setUpdateProgress(normalized);
-    setUpdateStatus(
-      "downloading",
-      `Downloading update... ${Math.round(normalized.percent)}%`,
-      {
-        currentVersion: app.getVersion(),
-      },
-    );
-  });
-
-  autoUpdater.on("update-downloaded", (info) => {
-    setUpdateStatus(
-      "downloaded",
-      "Update downloaded. Restart app to install now.",
-      {
-        currentVersion: app.getVersion(),
-        updateInfo: info || null,
-        canInstall: true,
-      },
-    );
-  });
-
-  autoUpdater.on("error", (error) => {
-    const message = error?.message || String(error);
-    if (message.includes("404") || message.includes("Not Found")) {
-      setUpdateStatus(
-        "up-to-date",
-        `You are on the latest version (${app.getVersion()})`,
-        { currentVersion: app.getVersion() },
-      );
-      return;
-    }
-    if (message.includes("checksum") || message.includes("sha512")) {
-      setUpdateStatus(
-        "error",
-        "Download verification failed. Please try again later or download manually from GitHub.",
-        { currentVersion: app.getVersion() },
-      );
-      return;
-    }
-    setUpdateStatus("error", `Updater error: ${message}`, {
-      currentVersion: app.getVersion(),
-    });
-  });
-  } else {
-    setUpdateStatus(
-      app.isPackaged ? "idle" : "disabled",
-      app.isPackaged
-        ? "Update service ready"
-        : "Auto-update is disabled in development mode",
-      { currentVersion: app.getVersion() },
-    );
-  }
+  setUpdateStatus(
+    app.isPackaged ? "idle" : "disabled",
+    app.isPackaged
+      ? "Update service ready"
+      : "Auto-update is disabled in development mode",
+    { currentVersion: app.getVersion() },
+  );
 
   // Startup check runs for ALL platforms when packaged
   if (app.isPackaged) {
@@ -420,32 +284,8 @@ function setupCoreIpc() {
   });
 
   ipcMain.handle("update:install", async () => {
-    const support = getUpdateSupportState();
-    if (!support.enabled) {
-      return {
-        ok: false,
-        error: support.reason,
-      };
-    }
-
-    if (lastUpdateStatus.stage !== "downloaded") {
-      return {
-        ok: false,
-        error: "No downloaded update is ready to install yet.",
-        state: getUpdateState(),
-      };
-    }
-
-    setUpdateStatus("installing", "Restarting to install update...", {
-      currentVersion: app.getVersion(),
-    });
-
-    setImmediate(() => {
-      try {
-        autoUpdater.quitAndInstall(false, true);
-      } catch {}
-    });
-
+    // Open GitHub releases page for manual download
+    shell.openExternal("https://github.com/aljailane/syns-man/releases/latest");
     return { ok: true };
   });
 }
