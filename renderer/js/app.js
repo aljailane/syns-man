@@ -2165,6 +2165,109 @@ let _aboutUpdateState = {
   progress: null,
 };
 const REPO_RELEASES_URL = "https://github.com/aljailane/syns-man/releases";
+const CHANGELOG_RAW_URL = "https://raw.githubusercontent.com/aljailane/syns-man/main/CHANGELOG.md";
+
+/* ─── Changelog fetcher ──────────────────────────────────────────────── */
+let _clFetched = false;
+
+function _escapeHtml(str) {
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function _parseChangelog(md) {
+  const lines = md.split("\n");
+  const entries = [];
+  let current = null;
+  let sectionType = null;
+
+  for (const rawLine of lines) {
+    const line = rawLine.trimEnd();
+
+    // New version heading: ## [1.0.14] - 2026-05-03  OR  ## [1.0.14]
+    const versionMatch = line.match(/^##\s+\[([^\]]+)\](?:\s*-\s*(.+))?/);
+    if (versionMatch) {
+      if (current) entries.push(current);
+      current = { version: versionMatch[1].trim(), date: (versionMatch[2] || "").trim(), items: [] };
+      sectionType = null;
+      continue;
+    }
+
+    if (!current) continue;
+
+    // Section headings: ### Added / Changed / Fixed / Removed
+    const sectionMatch = line.match(/^###\s+(.+)/);
+    if (sectionMatch) {
+      sectionType = sectionMatch[1].toLowerCase();
+      continue;
+    }
+
+    // List items
+    const itemMatch = line.match(/^[-*]\s+(.+)/);
+    if (itemMatch) {
+      let text = itemMatch[1]
+        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+        .replace(/`(.+?)`/g, "<code>$1</code>");
+      const type = (sectionType === "fixed" || sectionType === "fix") ? "fix"
+                 : (sectionType === "removed") ? "removed"
+                 : "feat";
+      current.items.push({ type, text });
+    }
+  }
+  if (current) entries.push(current);
+  return entries;
+}
+
+function _renderChangelogEntries(entries) {
+  if (!entries.length) return "";
+  const appVer = (window.syns.appVersion || "").replace(/^v/, "");
+  return entries.map((e, i) => {
+    const isLatest = i === 0;
+    const badgeClass = isLatest ? "cl-badge-latest" : "cl-badge-pre";
+    const badgeLabel = isLatest ? "Latest" : "Stable";
+    const dateStr = e.date ? `<span class="cl-date">${_escapeHtml(e.date)}</span>` : "";
+    const items = e.items.map(it => {
+      const cls = it.type === "fix" ? "cl-fix" : it.type === "removed" ? "cl-removed" : "cl-feat";
+      const icon = it.type === "fix" ? "🔧" : it.type === "removed" ? "🗑" : "✨";
+      return `<li class="${cls}">${icon} ${it.text}</li>`;
+    }).join("\n");
+    return `<div class="cl-entry">
+  <div class="cl-header">
+    <span class="cl-version">v${_escapeHtml(e.version)}</span>
+    ${dateStr}
+    <span class="cl-badge ${badgeClass}">${badgeLabel}</span>
+  </div>
+  ${items ? `<ul class="cl-list">${items}</ul>` : ""}
+</div>`;
+  }).join("\n");
+}
+
+async function loadChangelog() {
+  if (_clFetched) return;
+  const loading = document.getElementById("cl-loading");
+  const error = document.getElementById("cl-error");
+  const entries = document.getElementById("cl-entries");
+  const fallback = document.getElementById("cl-fallback-link");
+
+  if (fallback) {
+    fallback.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (window.syns.openExternal) window.syns.openExternal(REPO_RELEASES_URL);
+    });
+  }
+
+  try {
+    const res = await fetch(CHANGELOG_RAW_URL, { cache: "no-cache" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    const parsed = _parseChangelog(text);
+    if (loading) loading.style.display = "none";
+    if (entries) entries.innerHTML = _renderChangelogEntries(parsed);
+    _clFetched = true;
+  } catch (err) {
+    if (loading) loading.style.display = "none";
+    if (error) error.style.display = "block";
+  }
+}
 
 const UPDATE_STAGE_LABELS = {
   idle: "Idle",
@@ -2444,6 +2547,7 @@ function initAboutPage() {
       tab.classList.add("active");
       const panel = document.getElementById(`about-tab-${tab.dataset.tab}`);
       if (panel) panel.classList.add("active");
+      if (tab.dataset.tab === "changelog") loadChangelog();
     });
   });
 }

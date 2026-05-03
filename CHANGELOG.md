@@ -2,7 +2,16 @@
 
 All notable changes to this project are documented in this file.
 
-## [1.0.14] - 2026-05-03
+## [1.0.15] - 2026-05-04
+
+### Added
+- In-app changelog now fetched live from GitHub (`CHANGELOG.md`) — always up to date without rebuilding.
+- Changelog tab shows a spinner while loading and a fallback "View on GitHub" link on network error.
+
+### Changed
+- Removed all hardcoded changelog entries from `index.html`; content is now fully dynamic.
+
+
 
 ### Added
 - **Multi-color themes**: Ocean, Forest, Violet, and Rose themes added alongside existing Dark and Light.
