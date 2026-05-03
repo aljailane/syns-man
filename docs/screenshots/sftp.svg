@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="520" viewBox="0 0 900 520">
+  <rect width="900" height="520" fill="#1a1d23"/>
+  <rect x="0" y="0" width="220" height="520" fill="#13151a"/>
+  <text x="110" y="44" font-family="monospace" font-size="13" fill="#8b949e" text-anchor="middle">SYNS Man</text>
+  <text x="40" y="140" font-family="monospace" font-size="11" fill="#6e7681">Connections</text>
+  <rect x="20" y="152" width="180" height="28" rx="4" fill="#2d5a9e" opacity="0.5"/>
+  <text x="40" y="171" font-family="monospace" font-size="11" fill="#79c0ff">prod-server-01</text>
+  <rect x="240" y="20" width="640" height="480" rx="8" fill="#161b22"/>
+  <text x="268" y="55" font-family="monospace" font-size="16" fill="#f0f6fc" font-weight="bold">SFTP — prod-server-01</text>
+  <text x="268" y="75" font-family="monospace" font-size="11" fill="#6e7681">/var/www/html</text>
+  <rect x="268" y="86" width="580" height="32" rx="4" fill="#0d1117"/>
+  <text x="285" y="107" font-family="monospace" font-size="11" fill="#58a6ff">📁 ../</text>
+  <rect x="268" y="124" width="580" height="28" rx="3" fill="#161b22"/>
+  <text x="285" y="143" font-family="monospace" font-size="11" fill="#c9d1d9">📁 assets/</text>
+  <text x="700" y="143" font-family="monospace" font-size="10" fill="#6e7681">—</text>
+  <rect x="268" y="156" width="580" height="28" rx="3" fill="#161b22"/>
+  <text x="285" y="175" font-family="monospace" font-size="11" fill="#c9d1d9">📁 css/</text>
+  <rect x="268" y="188" width="580" height="28" rx="3" fill="#1f2937"/>
+  <text x="285" y="207" font-family="monospace" font-size="11" fill="#f0f6fc">📄 index.html</text>
+  <text x="680" y="207" font-family="monospace" font-size="10" fill="#6e7681">12.4 KB</text>
+  <rect x="268" y="220" width="580" height="28" rx="3" fill="#161b22"/>
+  <text x="285" y="239" font-family="monospace" font-size="11" fill="#c9d1d9">📄 app.js</text>
+  <text x="680" y="239" font-family="monospace" font-size="10" fill="#6e7681">48.1 KB</text>
+  <rect x="268" y="252" width="580" height="28" rx="3" fill="#161b22"/>
+  <text x="285" y="271" font-family="monospace" font-size="11" fill="#c9d1d9">📄 style.css</text>
+  <text x="680" y="271" font-family="monospace" font-size="10" fill="#6e7681">31.7 KB</text>
+  <rect x="268" y="430" width="120" height="30" rx="5" fill="#238636"/>
+  <text x="328" y="450" font-family="monospace" font-size="11" fill="#fff" text-anchor="middle">↑ Upload</text>
+  <rect x="400" y="430" width="120" height="30" rx="5" fill="#1f2937"/>
+  <text x="460" y="450" font-family="monospace" font-size="11" fill="#c9d1d9" text-anchor="middle">↓ Download</text>
+  <text x="550" y="490" font-family="monospace" font-size="10" fill="#30363d" text-anchor="middle">[ Replace with actual screenshot: docs/screenshots/sftp.png ]</text>
+</svg>

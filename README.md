@@ -1,16 +1,60 @@
 # SYNS Man
 
-A desktop SSH / SFTP manager built with Electron. Connect to remote servers, manage files over SFTP, and run commands over SSH — all from a clean, minimal interface.
+<p align="center">
+  <img src="docs/screenshots/dashboard.svg" alt="SYNS Man — Dashboard" width="100%"/>
+</p>
+
+<p align="center">
+  <a href="https://github.com/aljailane/syns-man/releases/latest"><img alt="Latest Release" src="https://img.shields.io/github/v/release/aljailane/syns-man?style=flat-square&color=58a6ff"/></a>
+  <img alt="Platform" src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux-informational?style=flat-square"/>
+  <img alt="License" src="https://img.shields.io/badge/license-MIT-green?style=flat-square"/>
+  <img alt="Electron" src="https://img.shields.io/badge/Electron-41-47848f?style=flat-square&logo=electron"/>
+</p>
+
+---
+
+## What is SYNS Man?
+
+**SYNS Man** is a lightweight, cross-platform desktop application for managing SSH and SFTP connections. It is built on top of [Electron](https://www.electronjs.org/) and designed to feel fast and minimal — no subscriptions, no cloud sync, everything stays on your machine.
+
+Whether you are a developer deploying code to a remote server, a sysadmin managing multiple Linux machines, or anyone who regularly works over SSH, SYNS Man gives you a clean interface to:
+
+- **Connect to remote servers** with SSH key or password authentication
+- **Browse and transfer files** over SFTP without needing a separate client
+- **Run terminal commands** in a live SSH session
+- **Save connection profiles** locally so you never retype credentials
+
+All credentials are stored in an encrypted local SQLite database — nothing leaves your device.
+
+---
+
+## Screenshots
+
+> Replace the SVG placeholders below with actual `.png` screenshots after first launch.  
+> Place them at `docs/screenshots/` with the same filenames.
+
+### Dashboard
+<img src="docs/screenshots/dashboard.svg" alt="Dashboard view" width="100%"/>
+
+### SFTP File Browser
+<img src="docs/screenshots/sftp.svg" alt="SFTP browser" width="100%"/>
+
+### SSH Terminal
+<img src="docs/screenshots/terminal.svg" alt="SSH terminal" width="100%"/>
 
 ---
 
 ## Features
 
-- SSH terminal sessions
-- SFTP file browser (upload, download, rename, delete)
-- Save and manage multiple server connections
-- Secure local credential storage
-- Auto-update support (Windows) / update notifications (Linux & macOS)
+| Feature | Description |
+|---------|-------------|
+| SSH Terminal | Full interactive SSH session inside the app |
+| SFTP Browser | Browse, upload, download, rename, and delete remote files |
+| Connection Manager | Save and organize multiple server profiles |
+| Secure Storage | Credentials stored in a local encrypted SQLite database |
+| Auto-update | Silent background updates on Windows via electron-updater |
+| Update Notifications | Banner + toast alerts on Linux and macOS when a new version is available |
+| Cross-platform | Runs on Windows (installer/portable), Linux (AppImage/deb/rpm) |
 
 ---
 
@@ -102,4 +146,5 @@ git push origin main --tags
 ## License
 
 MIT © [aljailane](https://github.com/aljailane)
+
 
