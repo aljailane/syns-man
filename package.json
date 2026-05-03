@@ -1,6 +1,6 @@
 {
   "name": "syns",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "SSH / SFTP Manager",
   "homepage": "https://github.com/aljailane/syns-man",
   "repository": {
@@ -49,16 +49,24 @@
         }
       ],
       "icon": "renderer/assets/icon.ico",
-      "artifactName": "SYNS-Man-Setup-${version}.${ext}"
+      "artifactName": "SYNS-Man-Setup-${version}.${ext}",
+      "signingHashAlgorithms": [
+        "sha256"
+      ],
+      "certificateSubjectName": "SYNS Man",
+      "verifyUpdateCodeSignature": false
     },
     "nsis": {
+      "guid": "A3F8C2D1-5E6B-4F7A-9C8D-2E1B3A4F5D6E",
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "installerIcon": "renderer/assets/icon.ico",
       "uninstallerIcon": "renderer/assets/icon.ico",
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "SYNS Man"
+      "shortcutName": "SYNS Man",
+      "uninstallDisplayName": "SYNS Man",
+      "deleteAppDataOnUninstall": false
     },
     "files": [
       "main.js",

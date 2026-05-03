@@ -61,6 +61,11 @@ jobs:
         run: |
           npm run version:sync
           npx electron-builder --win nsis portable --x64 --publish never
+        env:
+          # Code signing — add WIN_CSC_LINK (base64 .pfx) and WIN_CSC_KEY_PASSWORD in repo Secrets
+          CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false
 
       - name: Upload Windows artifacts
         uses: softprops/action-gh-release@v2
@@ -94,6 +99,13 @@ jobs:
         run: |
           npm run version:sync
           npx electron-builder --mac dmg zip --x64 --arm64 --publish never
+        env:
+          # Code signing — add MAC_CERT_P12 (base64), MAC_CERT_PASSWORD, APPLE_ID, APPLE_ID_PASSWORD, APPLE_TEAM_ID in repo Secrets
+          CSC_LINK: ${{ secrets.MAC_CERT_P12 }}
+          CSC_KEY_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASS: ${{ secrets.APPLE_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
       - name: Upload macOS artifacts
         uses: softprops/action-gh-release@v2
