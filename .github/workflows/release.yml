@@ -3,37 +3,50 @@ name: Build and Release Electron App
 on:
   push:
     tags:
-      - 'v*' # Run workflow when a new tag like v1.0.0 is pushed
+      - 'v*'
 
 jobs:
-  release:
-    runs-on: ${{ matrix.os }}
+  release-linux:
+    runs-on: ubuntu-latest
     permissions:
       contents: write
-
-    strategy:
-      matrix:
-        os: [windows-latest, ubuntu-latest]
-
     steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Install Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Install RPM tools (Linux only)
-        if: matrix.os == 'ubuntu-latest'
+      - name: Install RPM tools
         run: sudo apt-get update && sudo apt-get install -y rpm
 
-      - name: Build and Publish Electron app
+      - name: Build Linux (AppImage, deb, rpm)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npm run version:sync
-          npx electron-builder --publish always
+          npx electron-builder --linux AppImage deb rpm --x64 --publish always
+
+  release-windows:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Windows (NSIS installer + portable)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm run version:sync
+          npx electron-builder --win nsis portable --x64 --publish always

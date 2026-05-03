@@ -4,7 +4,7 @@ const { autoUpdater } = require("electron-updater");
 const { registerHandlers } = require("./src/ipc-handlers");
 
 let mainWindow;
-const UPDATE_CHECK_INTERVAL_MS = 15 * 60 * 1000;
+const UPDATE_STARTUP_DELAY_MS = 3000;
 
 let lastUpdateStatus = {
   stage: "idle",
@@ -12,7 +12,27 @@ let lastUpdateStatus = {
   at: new Date().toISOString(),
 };
 let lastUpdateProgress = null;
-let updateCheckTimer = null;
+let updateCheckInFlight = null;
+
+function getUpdateSupportState() {
+  if (!app.isPackaged) {
+    return {
+      enabled: false,
+      stage: "disabled",
+      reason: "Auto-update is disabled in development mode",
+    };
+  }
+
+  if (process.platform !== "win32") {
+    return {
+      enabled: false,
+      stage: "unsupported",
+      reason: "Auto-update is currently supported on Windows builds only",
+    };
+  }
+
+  return { enabled: true };
+}
 
 function emitToRenderer(channel, payload) {
   if (!mainWindow || mainWindow.isDestroyed()) return;
@@ -46,8 +66,9 @@ function getUpdateState() {
 }
 
 async function checkForUpdates(source = "manual") {
-  if (!app.isPackaged) {
-    setUpdateStatus("disabled", "Auto-update is disabled in development mode", {
+  const support = getUpdateSupportState();
+  if (!support.enabled) {
+    setUpdateStatus(support.stage, support.reason, {
       source,
       currentVersion: app.getVersion(),
     });
@@ -58,39 +79,50 @@ async function checkForUpdates(source = "manual") {
     };
   }
 
-  try {
-    setUpdateStatus("checking", "Checking for updates...", {
-      source,
-      currentVersion: app.getVersion(),
-    });
-    const result = await autoUpdater.checkForUpdates();
-    return {
-      ok: true,
-      updateInfo: result?.updateInfo || null,
-      state: getUpdateState(),
-    };
-  } catch (error) {
-    const message = error?.message || String(error);
-    
-    if (message.includes("404") || message.includes("Not Found")) {
-      setUpdateStatus("up-to-date", "No updates available (No release found).", {
+  if (updateCheckInFlight) return updateCheckInFlight;
+
+  updateCheckInFlight = (async () => {
+    try {
+      setUpdateStatus("checking", "Checking for updates...", {
         source,
         currentVersion: app.getVersion(),
       });
-      return { ok: true, updateInfo: null, state: getUpdateState() };
-    }
+      const result = await autoUpdater.checkForUpdates();
+      return {
+        ok: true,
+        updateInfo: result?.updateInfo || null,
+        state: getUpdateState(),
+      };
+    } catch (error) {
+      const message = error?.message || String(error);
 
-    setUpdateStatus("error", `Update check failed: ${message}`, {
-      source,
-      currentVersion: app.getVersion(),
-    });
-    return { ok: false, error: message, state: getUpdateState() };
+      if (message.includes("404") || message.includes("Not Found")) {
+        setUpdateStatus("up-to-date", "No updates available (No release found).", {
+          source,
+          currentVersion: app.getVersion(),
+        });
+        return { ok: true, updateInfo: null, state: getUpdateState() };
+      }
+
+      setUpdateStatus("error", `Update check failed: ${message}`, {
+        source,
+        currentVersion: app.getVersion(),
+      });
+      return { ok: false, error: message, state: getUpdateState() };
+    }
+  })();
+
+  try {
+    return await updateCheckInFlight;
+  } finally {
+    updateCheckInFlight = null;
   }
 }
 
 function setupAutoUpdater() {
-  if (!app.isPackaged) {
-    setUpdateStatus("disabled", "Auto-update is disabled in development mode", {
+  const support = getUpdateSupportState();
+  if (!support.enabled) {
+    setUpdateStatus(support.stage, support.reason, {
       currentVersion: app.getVersion(),
     });
     return;
@@ -167,11 +199,7 @@ function setupAutoUpdater() {
 
   setTimeout(() => {
     checkForUpdates("startup").catch(() => {});
-  }, 3000);
-
-  updateCheckTimer = setInterval(() => {
-    checkForUpdates("background").catch(() => {});
-  }, UPDATE_CHECK_INTERVAL_MS);
+  }, UPDATE_STARTUP_DELAY_MS);
 }
 
 function createWindow() {
@@ -281,10 +309,11 @@ function setupCoreIpc() {
   });
 
   ipcMain.handle("update:install", async () => {
-    if (!app.isPackaged) {
+    const support = getUpdateSupportState();
+    if (!support.enabled) {
       return {
         ok: false,
-        error: "Install is unavailable in development mode.",
+        error: support.reason,
       };
     }
 
@@ -326,8 +355,5 @@ app.on("window-all-closed", () => {
 });
 
 app.on("before-quit", () => {
-  if (updateCheckTimer) {
-    clearInterval(updateCheckTimer);
-    updateCheckTimer = null;
-  }
+  updateCheckInFlight = null;
 });

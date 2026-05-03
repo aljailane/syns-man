@@ -186,9 +186,9 @@ function loginPageHTML() {
           Sign In
         </button>
       </form>
-    </div>
-    <div style="text-align:center;margin-top:20px;">
-      <a href="#" id="reset-password-link" style="color:var(--text2);font-size:13px;text-decoration:underline;cursor:pointer;opacity:0.7;">نسيت كلمة المرور؟ (إعادة تعيين)</a>
+      <div class="auth-reset-wrap">
+        <a href="#" id="reset-password-link" class="auth-reset-link">Forgot password? (Reset)</a>
+      </div>
     </div>
     ${authSettingsModalHTML()}
   </div>`;

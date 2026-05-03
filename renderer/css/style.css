@@ -712,6 +712,27 @@ body.cards-expanded .server-icon {
     margin-bottom: 12px;
 }
 
+.auth-reset-wrap {
+    text-align: center;
+    margin-top: 14px;
+}
+
+.auth-reset-link {
+    display: inline-block;
+    color: var(--text2);
+    font-size: 13px;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+    opacity: 0.85;
+    direction: rtl;
+}
+
+.auth-reset-link:hover {
+    color: var(--text);
+    opacity: 1;
+}
+
 .auth-top-meta {
     position: fixed;
     top: 14px;
@@ -1731,6 +1752,10 @@ body.cards-expanded .server-icon {
 .about-actions {
     display: flex;
     gap: 10px;
+}
+
+.about-actions .repo-update-btn {
+    display: none;
 }
 
 .about-actions .btn.is-loading {

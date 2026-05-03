@@ -600,6 +600,7 @@ function bindLoginForm() {
       btn.textContent = "Signing in…";
 
       const res = await window.syns.adminLogin({ username, password });
+      if (res.ok) {
         enterApp();
       } else {
         showAlert("login-alert", res.error, "error");
@@ -2153,10 +2154,12 @@ let _aboutUpdateState = {
   status: null,
   progress: null,
 };
+const REPO_RELEASES_URL = "https://github.com/aljailane/syns-man/releases";
 
 const UPDATE_STAGE_LABELS = {
   idle: "Idle",
   disabled: "Disabled",
+  unsupported: "Unsupported",
   checking: "Checking",
   available: "Available",
   downloading: "Downloading",
@@ -2180,10 +2183,14 @@ function formatUpdateSpeed(bytesPerSecond) {
 function renderAboutUpdateState() {
   const status = _aboutUpdateState.status || {};
   const progress = _aboutUpdateState.progress || null;
+  const isLinux = window.syns.platform === "linux";
 
   const stage = status.stage || "idle";
   const stageLabel = UPDATE_STAGE_LABELS[stage] || stage;
-  const message = status.message || "Update service is ready";
+  const defaultMessage = isLinux
+    ? "Linux updates are provided via repository releases"
+    : "Update service is ready";
+  const message = status.message || defaultMessage;
 
   aboutSetText("about-update-stage", stageLabel);
   aboutSetText("about-update-message", message);
@@ -2211,10 +2218,24 @@ function renderAboutUpdateState() {
   }
 
   const installBtn = document.getElementById("btn-install-update");
-  if (installBtn) {
+  if (installBtn && !isLinux) {
     installBtn.disabled = stage !== "downloaded";
     if (stage !== "installing") installBtn.classList.remove("is-loading");
   }
+}
+
+function applySmartUpdateActions() {
+  const platform = window.syns.platform;
+  const isWindows = platform === "win32";
+  const isLinux = platform === "linux";
+
+  const checkBtn = document.getElementById("btn-check-update");
+  const installBtn = document.getElementById("btn-install-update");
+  const repoBtn = document.getElementById("btn-repo-update");
+
+  if (checkBtn) checkBtn.style.display = isWindows ? "inline-flex" : "none";
+  if (installBtn) installBtn.style.display = isWindows ? "inline-flex" : "none";
+  if (repoBtn) repoBtn.style.display = isLinux ? "inline-flex" : "none";
 }
 
 function bindAboutUpdateRealtime() {
@@ -2307,6 +2328,16 @@ async function requestUpdateInstall() {
   }
 }
 
+function requestRepositoryUpdate() {
+  if (!window.syns.openExternal) {
+    showSftpToast("External links are unavailable");
+    return;
+  }
+
+  window.syns.openExternal(REPO_RELEASES_URL);
+  showSftpToast("Opened repository releases page");
+}
+
 function initAboutPage() {
   const platMap = { win32: "Windows", darwin: "macOS", linux: "Linux" };
   const ver = window.syns.appVersion || "1.0.0";
@@ -2326,6 +2357,8 @@ function initAboutPage() {
   set("about-node-ver", node);
   set("about-platform-name", plat);
   set("about-platform", `· ${plat}`);
+
+  applySmartUpdateActions();
 
   if (window.syns.getAppVersion) {
     window.syns
@@ -2348,6 +2381,9 @@ function initAboutPage() {
   document
     .getElementById("btn-install-update")
     ?.addEventListener("click", requestUpdateInstall);
+  document
+    .getElementById("btn-repo-update")
+    ?.addEventListener("click", requestRepositoryUpdate);
 
   document.querySelectorAll(".about-link[data-ext]").forEach((a) => {
     a.addEventListener("click", (e) => {
