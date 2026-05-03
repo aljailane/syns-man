@@ -822,9 +822,6 @@
                             <button class="about-tab" data-tab="changelog">
                                 Changelog
                             </button>
-                            <button class="about-tab" data-tab="whats-new">
-                                What's New
-                            </button>
                         </div>
 
                         <!-- Update notification banner (shown when update is available/downloaded) -->
@@ -1079,38 +1076,57 @@
                             <div class="about-wrap">
                                 <div class="cl-entry">
                                     <div class="cl-header">
-                                        <span class="cl-version">v1.0.2</span>
-                                        <span class="cl-date"
-                                            >May 01, 2026</span
-                                        >
-                                        <span class="cl-badge cl-badge-latest"
-                                            >Latest</span
-                                        >
+                                        <span class="cl-version">v1.0.6</span>
+                                        <span class="cl-date">May 03, 2026</span>
+                                        <span class="cl-badge cl-badge-latest">Latest</span>
                                     </div>
                                     <ul class="cl-list">
-                                        <li class="cl-fix">
-                                            🔧 Fixed startup crash in
-                                            <code>main.js</code> (unexpected end
-                                            of input)
-                                        </li>
-                                        <li class="cl-feat">
-                                            ✨ Added realtime updater flow
-                                            (check, download progress, install)
-                                        </li>
-                                        <li class="cl-feat">
-                                            ✨ Added live update status card in
-                                            About page (stage, versions,
-                                            progress)
-                                        </li>
-                                        <li class="cl-fix">
-                                            🔧 Improved startup window sizing to
-                                            fit different screens and DPI scales
-                                        </li>
-                                        <li class="cl-feat">
-                                            ✨ Added version sync &amp; release
-                                            scripts and aligned project to
-                                            <code>v1.0.2</code>
-                                        </li>
+                                        <li class="cl-feat">✨ Update notification banner in About page (shown on available/downloaded)</li>
+                                        <li class="cl-feat">✨ Smart About UI — in-app updater on Windows, repository button on Linux</li>
+                                        <li class="cl-fix">🔧 Simplified update system — removed background polling, added mutex guard</li>
+                                        <li class="cl-fix">🔧 Fixed login form syntax error causing blank screen on submit</li>
+                                        <li class="cl-fix">🔧 Removed duplicate <code>admin:reset</code> IPC handler causing startup crash</li>
+                                        <li class="cl-fix">🔧 Reset password link moved inside auth card with English label</li>
+                                        <li class="cl-feat">✨ Improved GitHub Actions workflow — separate Linux/Windows build jobs</li>
+                                    </ul>
+                                </div>
+
+                                <div class="cl-entry">
+                                    <div class="cl-header">
+                                        <span class="cl-version">v1.0.5</span>
+                                        <span class="cl-date">May 01, 2026</span>
+                                        <span class="cl-badge cl-badge-pre">Stable</span>
+                                    </div>
+                                    <ul class="cl-list">
+                                        <li class="cl-feat">✨ Added password reset feature for admin account</li>
+                                        <li class="cl-feat">✨ Reset link displayed on login page inside auth card</li>
+                                    </ul>
+                                </div>
+
+                                <div class="cl-entry">
+                                    <div class="cl-header">
+                                        <span class="cl-version">v1.0.4</span>
+                                        <span class="cl-date">April 30, 2026</span>
+                                        <span class="cl-badge cl-badge-pre">Stable</span>
+                                    </div>
+                                    <ul class="cl-list">
+                                        <li class="cl-fix">🔧 Fixed GitHub Actions permissions for release publishing</li>
+                                        <li class="cl-feat">✨ Added AppImage target for Linux auto-updater support</li>
+                                    </ul>
+                                </div>
+
+                                <div class="cl-entry">
+                                    <div class="cl-header">
+                                        <span class="cl-version">v1.0.2</span>
+                                        <span class="cl-date">April 30, 2026</span>
+                                        <span class="cl-badge cl-badge-pre">Stable</span>
+                                    </div>
+                                    <ul class="cl-list">
+                                        <li class="cl-fix">🔧 Fixed startup crash in <code>main.js</code> (unexpected end of input)</li>
+                                        <li class="cl-feat">✨ Added realtime updater flow (check, download progress, install)</li>
+                                        <li class="cl-feat">✨ Added live update status card in About page</li>
+                                        <li class="cl-fix">🔧 Improved startup window sizing for different screens and DPI scales</li>
+                                        <li class="cl-feat">✨ Added version sync &amp; release scripts</li>
                                     </ul>
                                 </div>
 
@@ -1129,11 +1145,7 @@
                                             ✨ Theme toggle — Dark &amp; Light
                                             mode with persistent preference
                                         </li>
-                                        <li class="cl-feat">
-                                            ✨ About page — tabs (Overview ·
-                                            Changelog · What's New) with runtime
-                                            info
-                                        </li>
+                                        <li class="cl-feat">✨ About page — tabs (Overview · Changelog) with runtime info</li>
                                         <li class="cl-feat">
                                             ✨ Sidebar: Settings (soon) &amp;
                                             About links added
@@ -1231,107 +1243,7 @@
                         </div>
                         <!-- /tab changelog -->
 
-                        <!-- Tab: What's New -->
-                        <div class="about-tab-panel" id="about-tab-whats-new">
-                            <div class="about-wrap">
-                                <div class="wn-hero">
-                                    <div class="wn-version-badge">v1.0.2</div>
-                                    <h2 class="wn-title">
-                                        What's New in SYNS Man
-                                    </h2>
-                                    <p class="wn-sub">
-                                        Here's everything added and improved in
-                                        the latest release.
-                                    </p>
-                                </div>
 
-                                <div class="wn-grid">
-                                    <div class="wn-card">
-                                        <div class="wn-icon">🌓</div>
-                                        <div>
-                                            <div class="wn-card-title">
-                                                Dark &amp; Light Theme
-                                            </div>
-                                            <div class="wn-card-desc">
-                                                Switch between dark and light
-                                                modes instantly. Your preference
-                                                is saved and restored on every
-                                                launch.
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="wn-card">
-                                        <div class="wn-icon">ℹ️</div>
-                                        <div>
-                                            <div class="wn-card-title">
-                                                Redesigned About Page
-                                            </div>
-                                            <div class="wn-card-desc">
-                                                New tabbed About page with
-                                                runtime details, full changelog,
-                                                and What's New section.
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="wn-card">
-                                        <div class="wn-icon">⚙️</div>
-                                        <div>
-                                            <div class="wn-card-title">
-                                                Settings (Coming Soon)
-                                            </div>
-                                            <div class="wn-card-desc">
-                                                Settings panel is in
-                                                development. Expect theme
-                                                controls, default port, and
-                                                keyboard shortcuts.
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="wn-card">
-                                        <div class="wn-icon">🔑</div>
-                                        <div>
-                                            <div class="wn-card-title">
-                                                Smarter Key Path Input
-                                            </div>
-                                            <div class="wn-card-desc">
-                                                Private key path placeholder now
-                                                shows the correct default path
-                                                for your operating system
-                                                (Linux, macOS, Windows).
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="wn-card">
-                                        <div class="wn-icon">📐</div>
-                                        <div>
-                                            <div class="wn-card-title">
-                                                Improved Add-Server Form
-                                            </div>
-                                            <div class="wn-card-desc">
-                                                Port moved next to
-                                                Authentication for a cleaner
-                                                layout. All fields are now equal
-                                                width and contained.
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="wn-card">
-                                        <div class="wn-icon">🐛</div>
-                                        <div>
-                                            <div class="wn-card-title">
-                                                Black Screen Fix
-                                            </div>
-                                            <div class="wn-card-desc">
-                                                Resolved a preload sandbox crash
-                                                that caused a blank screen on
-                                                first launch after install.
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- /tab whats-new -->
                     </div>
                 </div>
             </div>
