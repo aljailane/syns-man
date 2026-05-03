@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>دليل الرفع إلى GitHub</title>
+  <style>
+    body { font-family: Segoe UI, Tahoma, Arial, sans-serif; margin: 0; background: #0f1117; color: #e2e8f0; }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 24px 20px 40px; }
+    h1, h2 { margin-top: 0; }
+    .card { background: #161b27; border: 1px solid #2a3145; border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+    code { background: #111827; padding: 2px 6px; border-radius: 6px; color: #93c5fd; }
+    a { color: #7fb0ff; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <p><a href="./index.html">← العودة إلى فهرس docs</a></p>
+    <h1>دليل رفع المشروع إلى GitHub</h1>
+
+    <div class="card">
+      <h2>رفع الكود</h2>
+      <ol>
+        <li><code>git add .</code></li>
+        <li><code>git commit -m "prepare release"</code></li>
+        <li><code>git push</code></li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h2>بناء EXE</h2>
+      <p>نفّذ: <code>npm run dist</code></p>
+    </div>
+
+    <div class="card">
+      <h2>رفع Release يدوي</h2>
+      <ol>
+        <li>أنشئ Tag مثل <code>v1.0.2</code>.</li>
+        <li>ارفع ملفات <code>dist</code> المهمة (Setup + blockmap + latest.yml + portable).</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h2>رفع Release آلي</h2>
+      <p>استخدم <code>npm run release:publish</code> بعد ضبط <code>GH_TOKEN</code>.</p>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,117 @@
+{
+  "name": "syns",
+  "version": "1.0.2",
+  "description": "SSH / SFTP Manager",
+  "homepage": "https://github.com/aljailane/syns-man",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win --x64",
+    "dist:linux": "electron-builder --linux --x64",
+    "build:all": "npm run version:sync && electron-builder --win --linux --x64",
+    "update:dry": "npm run version:sync && electron-builder --publish never",
+    "version:sync": "node scripts/sync-version.js",
+    "release:patch": "npm version patch --no-git-tag-version && npm run version:sync",
+    "release:minor": "npm version minor --no-git-tag-version && npm run version:sync",
+    "release:major": "npm version major --no-git-tag-version && npm run version:sync",
+    "release:publish": "npm run version:sync && electron-builder --win --linux --x64 --publish always",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "SYNS Man",
+  "license": "ISC",
+  "type": "commonjs",
+  "build": {
+    "appId": "com.syns.app",
+    "productName": "SYNS Man",
+    "npmRebuild": false,
+    "copyright": "Copyright © 2026 SYNS Man",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "renderer/assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "renderer/assets/icon.ico",
+      "uninstallerIcon": "renderer/assets/icon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "SYNS Man"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**",
+      "db/**",
+      "renderer/**",
+      "node_modules/**",
+      "!node_modules/.cache/**",
+      "!**/*.map",
+      "!**/electron-builder/**",
+      "!**/.git/**"
+    ],
+    "asar": true,
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "aljailane",
+        "repo": "syns-man"
+      }
+    ],
+    "linux": {
+      "target": [
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "renderer/assets/icon.png",
+      "category": "Network",
+      "description": "SSH / SFTP Manager",
+      "maintainer": "SYNS Man <syns@localhost>"
+    },
+    "deb": {
+      "depends": [
+        "libnotify4",
+        "libxtst6",
+        "libnss3"
+      ],
+      "packageCategory": "net",
+      "priority": "optional"
+    }
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "codemirror": "^5.65.21",
+    "electron-store": "^8.2.0",
+    "electron-updater": "^6.8.3",
+    "socks": "^2.8.8",
+    "ssh2": "^1.16.0",
+    "xterm": "^5.3.0",
+    "xterm-addon-attach": "^0.9.0",
+    "xterm-addon-fit": "^0.8.0"
+  },
+  "devDependencies": {
+    "electron": "^41.3.0",
+    "electron-builder": "^26.8.1"
+  }
+}

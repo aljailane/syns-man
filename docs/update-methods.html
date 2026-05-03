@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>طرق التحديث</title>
+  <style>
+    body { font-family: Segoe UI, Tahoma, Arial, sans-serif; margin: 0; background: #0f1117; color: #e2e8f0; }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 24px 20px 40px; }
+    .card { background: #161b27; border: 1px solid #2a3145; border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+    code { background: #111827; padding: 2px 6px; border-radius: 6px; color: #93c5fd; }
+    a { color: #7fb0ff; text-decoration: none; }
+    h1, h3 { margin-top: 0; }
+    ul, ol { margin: 8px 0 0; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <p><a href="./index.html">← العودة إلى فهرس docs</a></p>
+    <h1>طرق التحديث</h1>
+
+    <div class="card">
+      <h3>1) التحديث التلقائي داخل التطبيق</h3>
+      <p>يعتمد على <code>electron-updater</code> ويتطلب Release صالح في GitHub.</p>
+      <ol>
+        <li>فحص التحديث.</li>
+        <li>تنزيل الإصدار الجديد.</li>
+        <li>إظهار التقدم في واجهة About.</li>
+        <li>التثبيت عبر زر Install Update.</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h3>2) التحديث اليدوي</h3>
+      <p>تحميل نسخة Setup أو Portable من صفحة Releases ثم التثبيت يدويًا.</p>
+    </div>
+
+    <div class="card">
+      <h3>3) الملفات المطلوبة لنجاح التحديث التلقائي</h3>
+      <ul>
+        <li>Setup EXE</li>
+        <li>blockmap</li>
+        <li><code>latest.yml</code></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>4) ملاحظات مهمة</h3>
+      <p>التحديث التلقائي لا يعمل في <code>npm start</code> (وضع التطوير).</p>
+    </div>
+
+    <div class="card">
+      <h3>5) استكشاف مشاكل شائعة</h3>
+      <p>تحقق من رقم الإصدار، ملفات Release، وصحة إعدادات <code>build.publish</code>.</p>
+    </div>
+  </div>
+</body>
+</html>

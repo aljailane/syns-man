@@ -1,0 +1,1934 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            http-equiv="Content-Security-Policy"
+            content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:"
+        />
+        <title>SYNS Man — SSH Manager</title>
+        <link rel="stylesheet" href="css/style.css" />
+        <script>
+            // Apply saved theme ASAP to avoid flash
+            (function () {
+                try {
+                    var t = localStorage.getItem("syns-theme") || "dark";
+                    document.documentElement.setAttribute("data-theme", t);
+                } catch (e) {
+                    document.documentElement.setAttribute("data-theme", "dark");
+                }
+            })();
+        </script>
+    </head>
+    <body>
+        <!-- Auth pages (full screen, shown before login) -->
+        <div id="auth-root"></div>
+
+        <!-- Main app shell (hidden until logged in) -->
+        <div
+            id="main-shell"
+            style="display: none; flex-direction: column; height: 100vh"
+        >
+            <!-- Titlebar -->
+            <div id="titlebar">
+                <span class="app-name">SYNS Man</span>
+                <span class="spacer"></span>
+                <button
+                    class="theme-toggle"
+                    id="theme-toggle"
+                    title="Toggle theme"
+                >
+                    <span id="theme-icon" aria-hidden="true"
+                        ><svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M12.6 3.2C8.5 3.2 5.2 6.5 5.2 10.6C5.2 14.7 8.5 18 12.6 18C15.3 18 17.7 16.6 19 14.5C17.9 14.9 16.7 15.1 15.5 15.1C10.9 15.1 7.1 11.3 7.1 6.7C7.1 5.5 7.3 4.3 7.7 3.2C6.2 3.9 4.9 5.1 4.2 6.6C3.8 7.5 3.6 8.5 3.6 9.6C3.6 14.9 7.9 19.2 13.2 19.2C18.5 19.2 22.8 14.9 22.8 9.6C22.8 8.5 22.6 7.5 22.2 6.6C20.4 9 17.6 10.6 14.4 10.6C13.8 10.6 13.2 10.5 12.6 10.4V3.2Z"
+                                fill="currentColor"
+                            /></svg
+                    ></span>
+                </button>
+                <button
+                    class="layout-icon-btn"
+                    id="layout-expand-toggle"
+                    title="Expand sections"
+                >
+                    <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M9 3H3V9"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+                        <path
+                            d="M15 3H21V9"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+                        <path
+                            d="M9 21H3V15"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+                        <path
+                            d="M15 21H21V15"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+                    </svg>
+                </button>
+                <div class="win-controls">
+                    <button class="win-btn min" id="win-min"></button>
+                    <button class="win-btn max" id="win-max"></button>
+                    <button class="win-btn close" id="win-close"></button>
+                </div>
+            </div>
+
+            <div id="app">
+                <!-- Sidebar -->
+                <nav id="sidebar">
+                    <div class="nav-section">Navigation</div>
+                    <div class="nav-item active" data-page="dashboard">
+                        <span class="icon" aria-hidden="true"
+                            ><svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M4 5.5C4 4.67 4.67 4 5.5 4H18.5C19.33 4 20 4.67 20 5.5V14.5C20 15.33 19.33 16 18.5 16H14L16.2 19H7.8L10 16H5.5C4.67 16 4 15.33 4 14.5V5.5Z"
+                                    fill="currentColor"
+                                /></svg
+                        ></span>
+                        Servers
+                    </div>
+                    <div class="nav-divider"></div>
+                    <div class="nav-section">Recent</div>
+                    <div id="recent-list"></div>
+                    <div class="sidebar-footer">
+                        <div class="nav-item" data-page="settings">
+                            <span class="icon" aria-hidden="true"
+                                ><svg
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        d="M10.45 2.85C10.76 1.72 12.24 1.72 12.55 2.85L12.8 3.77C13.01 4.53 13.85 4.9 14.55 4.54L15.39 4.11C16.42 3.59 17.59 4.76 17.07 5.79L16.64 6.63C16.28 7.33 16.65 8.17 17.41 8.38L18.33 8.63C19.46 8.94 19.46 10.42 18.33 10.73L17.41 10.98C16.65 11.19 16.28 12.03 16.64 12.73L17.07 13.57C17.59 14.6 16.42 15.77 15.39 15.25L14.55 14.82C13.85 14.46 13.01 14.83 12.8 15.59L12.55 16.51C12.24 17.64 10.76 17.64 10.45 16.51L10.2 15.59C9.99 14.83 9.15 14.46 8.45 14.82L7.61 15.25C6.58 15.77 5.41 14.6 5.93 13.57L6.36 12.73C6.72 12.03 6.35 11.19 5.59 10.98L4.67 10.73C3.54 10.42 3.54 8.94 4.67 8.63L5.59 8.38C6.35 8.17 6.72 7.33 6.36 6.63L5.93 5.79C5.41 4.76 6.58 3.59 7.61 4.11L8.45 4.54C9.15 4.9 9.99 4.53 10.2 3.77L10.45 2.85ZM11.5 7.5C10.12 7.5 9 8.62 9 10C9 11.38 10.12 12.5 11.5 12.5C12.88 12.5 14 11.38 14 10C14 8.62 12.88 7.5 11.5 7.5Z"
+                                        fill="currentColor"
+                                    /></svg
+                            ></span>
+                            Settings
+                        </div>
+                        <div class="nav-item" data-page="about">
+                            <span class="icon" aria-hidden="true"
+                                ><svg
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 6.8C12.66 6.8 13.2 7.34 13.2 8C13.2 8.66 12.66 9.2 12 9.2C11.34 9.2 10.8 8.66 10.8 8C10.8 7.34 11.34 6.8 12 6.8ZM13.4 17H10.6V15.6H11.3V11.1H10.6V9.7H12.7V15.6H13.4V17Z"
+                                        fill="currentColor"
+                                    /></svg
+                            ></span>
+                            About
+                        </div>
+                        <div
+                            class="nav-item"
+                            id="logout-btn"
+                            style="margin-top: 8px"
+                        >
+                            <span class="icon" aria-hidden="true"
+                                ><svg
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        d="M10 3H6C4.9 3 4 3.9 4 5V19C4 20.1 4.9 21 6 21H10V19H6V5H10V3Z"
+                                        fill="currentColor"
+                                    />
+                                    <path
+                                        d="M13.3 7.3L11.9 8.7L14.2 11H8V13H14.2L11.9 15.3L13.3 16.7L18 12L13.3 7.3Z"
+                                        fill="currentColor"
+                                    /></svg
+                            ></span>
+                            Logout
+                        </div>
+                    </div>
+                </nav>
+                <div id="sidebar-resizer" title="Resize sidebar"></div>
+
+                <!-- Content -->
+                <div id="content">
+                    <!-- Dashboard page -->
+                    <div class="page active" id="page-dashboard">
+                        <div class="page-header">
+                            <div>
+                                <div class="page-title">Servers</div>
+                                <div class="page-sub">
+                                    Manage your SSH / SFTP connections
+                                </div>
+                            </div>
+                            <div
+                                style="
+                                    margin-left: auto;
+                                    display: flex;
+                                    gap: 8px;
+                                    align-items: center;
+                                "
+                            >
+                                <button
+                                    class="layout-icon-btn"
+                                    id="cards-expand-toggle"
+                                    title="Expand cards"
+                                >
+                                    <svg
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            d="M8 3H3V8"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        />
+                                        <path
+                                            d="M16 3H21V8"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        />
+                                        <path
+                                            d="M8 21H3V16"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        />
+                                        <path
+                                            d="M16 21H21V16"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        />
+                                    </svg>
+                                </button>
+                                <button
+                                    class="btn btn-primary"
+                                    id="btn-add-server"
+                                >
+                                    ＋ Add Server
+                                </button>
+                            </div>
+                        </div>
+                        <div id="server-grid-container"></div>
+                    </div>
+
+                    <!-- Terminal page -->
+                    <div class="page" id="page-terminal" style="padding: 0">
+                        <div id="terminal-header">
+                            <span
+                                class="dot dot-green"
+                                id="term-status-dot"
+                            ></span>
+                            <span
+                                id="term-title"
+                                style="font-size: 14px; font-weight: 600"
+                                >Terminal</span
+                            >
+                            <div
+                                style="
+                                    margin-left: auto;
+                                    display: flex;
+                                    gap: 8px;
+                                "
+                            >
+                                <button
+                                    class="btn btn-ghost btn-sm"
+                                    id="btn-open-sftp"
+                                    style="
+                                        display: inline-flex;
+                                        align-items: center;
+                                        gap: 6px;
+                                    "
+                                >
+                                    <svg
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            d="M3 7.5C3 6.67 3.67 6 4.5 6H9L10.5 8H19.5C20.33 8 21 8.67 21 9.5V17.5C21 18.33 20.33 19 19.5 19H4.5C3.67 19 3 18.33 3 17.5V7.5Z"
+                                            fill="currentColor"
+                                        />
+                                    </svg>
+                                    SFTP
+                                </button>
+                                <button
+                                    class="btn btn-danger btn-sm"
+                                    id="btn-disconnect-ssh"
+                                >
+                                    Disconnect
+                                </button>
+                            </div>
+                        </div>
+                        <div id="xterm-container"></div>
+                    </div>
+
+                    <!-- SFTP page -->
+                    <div class="page" id="page-sftp" style="padding: 0">
+                        <div class="sftp-toolbar">
+                            <button
+                                class="btn btn-ghost btn-sm"
+                                id="sftp-back"
+                                style="
+                                    display: inline-flex;
+                                    align-items: center;
+                                    gap: 6px;
+                                "
+                            >
+                                <svg
+                                    width="13"
+                                    height="13"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="M14.7 5.3L8 12L14.7 18.7"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    />
+                                </svg>
+                                Back
+                            </button>
+                            <span
+                                id="sftp-server-name"
+                                style="
+                                    font-weight: 600;
+                                    font-size: 14px;
+                                    flex-shrink: 0;
+                                "
+                            ></span>
+                            <input class="path-bar" id="sftp-path" value="/" />
+                            <button
+                                class="btn btn-ghost btn-sm"
+                                id="sftp-history-btn"
+                                title="Path history"
+                            >
+                                &#x1F55B;
+                            </button>
+                            <button class="btn btn-ghost btn-sm" id="sftp-go">
+                                Go
+                            </button>
+                            <button
+                                class="btn btn-ghost btn-sm"
+                                id="sftp-refresh"
+                                title="Refresh"
+                            >
+                                &#x21BB;
+                            </button>
+                            <button
+                                class="btn btn-ghost btn-sm"
+                                id="sftp-mkdir"
+                                title="New Folder"
+                            >
+                                &#x1F4C2;+
+                            </button>
+                            <button
+                                class="btn btn-ghost btn-sm"
+                                id="sftp-upload"
+                                title="Upload files"
+                            >
+                                &#x2B06; Upload
+                            </button>
+                            <button
+                                class="btn btn-danger btn-sm"
+                                id="btn-disconnect-sftp"
+                            >
+                                Disconnect
+                            </button>
+                        </div>
+                        <div
+                            id="sftp-op-bar"
+                            style="
+                                display: none;
+                                align-items: center;
+                                gap: 10px;
+                                padding: 6px 16px;
+                                background: var(--bg3);
+                                border-bottom: 1px solid var(--border);
+                            "
+                        >
+                            <div
+                                class="spinner"
+                                style="width: 14px; height: 14px"
+                            ></div>
+                            <span
+                                id="sftp-op-text"
+                                style="
+                                    font-size: 12.5px;
+                                    color: var(--text2);
+                                    flex: 1;
+                                "
+                            ></span>
+                            <div
+                                id="sftp-op-progress-wrap"
+                                style="
+                                    flex: 1;
+                                    max-width: 200px;
+                                    height: 4px;
+                                    background: var(--border);
+                                    border-radius: 2px;
+                                "
+                            >
+                                <div
+                                    id="sftp-op-progress-fill"
+                                    style="
+                                        height: 100%;
+                                        background: var(--accent);
+                                        border-radius: 2px;
+                                        width: 0%;
+                                        transition: width 0.2s;
+                                    "
+                                ></div>
+                            </div>
+                        </div>
+                        <div
+                            id="sftp-history-panel"
+                            class="history-panel"
+                            style="display: none"
+                        ></div>
+                        <div class="file-list" id="file-list"></div>
+                    </div>
+
+                    <!-- Settings page -->
+                    <div class="page" id="page-settings">
+                        <div class="page-header">
+                            <div>
+                                <div class="page-title">Settings</div>
+                                <div class="page-sub">
+                                    Manage application preferences
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="settings-wrap">
+                            <!-- Appearance -->
+                            <div class="settings-section">
+                                <div
+                                    class="settings-section-title"
+                                    style="
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 7px;
+                                    "
+                                >
+                                    <svg
+                                        width="13"
+                                        height="13"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            d="M12 3C7.03 3 3 7.03 3 12C3 15.31 5.69 18 9 18H10.5C11.33 18 12 18.67 12 19.5C12 20.33 12.67 21 13.5 21C17.64 21 21 17.64 21 13.5C21 7.7 16.3 3 12 3ZM7.5 11C6.67 11 6 10.33 6 9.5C6 8.67 6.67 8 7.5 8C8.33 8 9 8.67 9 9.5C9 10.33 8.33 11 7.5 11ZM11 8C10.17 8 9.5 7.33 9.5 6.5C9.5 5.67 10.17 5 11 5C11.83 5 12.5 5.67 12.5 6.5C12.5 7.33 11.83 8 11 8ZM15 8C14.17 8 13.5 7.33 13.5 6.5C13.5 5.67 14.17 5 15 5C15.83 5 16.5 5.67 16.5 6.5C16.5 7.33 15.83 8 15 8Z"
+                                            fill="currentColor"
+                                        />
+                                    </svg>
+                                    Appearance
+                                </div>
+                                <div class="settings-card">
+                                    <div class="settings-row">
+                                        <div class="settings-row-info">
+                                            <div class="settings-row-label">
+                                                Theme
+                                            </div>
+                                            <div class="settings-row-desc">
+                                                Choose between dark and light
+                                                mode
+                                            </div>
+                                        </div>
+                                        <div class="settings-row-control">
+                                            <div class="theme-switcher">
+                                                <button
+                                                    class="theme-opt"
+                                                    data-theme-opt="dark"
+                                                    id="stg-theme-dark"
+                                                    style="
+                                                        display: inline-flex;
+                                                        align-items: center;
+                                                        gap: 6px;
+                                                    "
+                                                >
+                                                    <svg
+                                                        width="14"
+                                                        height="14"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        aria-hidden="true"
+                                                    >
+                                                        <path
+                                                            d="M12.4 3.5C8.65 3.5 5.6 6.55 5.6 10.3C5.6 14.05 8.65 17.1 12.4 17.1C14.86 17.1 17.04 15.79 18.22 13.82C17.2 14.17 16.12 14.36 15.02 14.36C10.84 14.36 7.44 10.96 7.44 6.78C7.44 5.79 7.63 4.84 7.97 3.95C6.61 4.56 5.45 5.63 4.74 6.95C4.2 7.95 3.9 9.1 3.9 10.3C3.9 15 7.7 18.8 12.4 18.8C17.1 18.8 20.9 15 20.9 10.3C20.9 9.22 20.7 8.2 20.34 7.27C18.73 9.34 16.2 10.7 13.36 10.7C12.97 10.7 12.58 10.67 12.2 10.6V3.5H12.4Z"
+                                                            fill="currentColor"
+                                                        />
+                                                    </svg>
+                                                    Dark
+                                                </button>
+                                                <button
+                                                    class="theme-opt"
+                                                    data-theme-opt="light"
+                                                    id="stg-theme-light"
+                                                    style="
+                                                        display: inline-flex;
+                                                        align-items: center;
+                                                        gap: 6px;
+                                                    "
+                                                >
+                                                    <svg
+                                                        width="14"
+                                                        height="14"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        aria-hidden="true"
+                                                    >
+                                                        <path
+                                                            d="M12 6.3C8.85 6.3 6.3 8.85 6.3 12C6.3 15.15 8.85 17.7 12 17.7C15.15 17.7 17.7 15.15 17.7 12C17.7 8.85 15.15 6.3 12 6.3ZM12 3V4.8M12 19.2V21M3 12H4.8M19.2 12H21M5.1 5.1L6.4 6.4M17.6 17.6L18.9 18.9M18.9 5.1L17.6 6.4M6.4 17.6L5.1 18.9"
+                                                            stroke="currentColor"
+                                                            stroke-width="1.8"
+                                                            stroke-linecap="round"
+                                                        />
+                                                    </svg>
+                                                    Light
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Proxy -->
+                            <div class="settings-section">
+                                <div
+                                    class="settings-section-title"
+                                    style="
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 7px;
+                                    "
+                                >
+                                    <svg
+                                        width="13"
+                                        height="13"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            d="M7 4V14.2C7 15.3 7.9 16.2 9 16.2H17"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                        />
+                                        <path
+                                            d="M17 13.5L20 16.2L17 18.9"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        />
+                                        <path
+                                            d="M17 7.8H9C7.9 7.8 7 8.7 7 9.8V20"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                        />
+                                    </svg>
+                                    Proxy
+                                </div>
+                                <div class="settings-card">
+                                    <!-- Enable toggle -->
+                                    <div class="settings-row">
+                                        <div class="settings-row-info">
+                                            <div class="settings-row-label">
+                                                Enable Proxy
+                                            </div>
+                                            <div class="settings-row-desc">
+                                                Route SSH / SFTP connections
+                                                through a proxy server
+                                            </div>
+                                        </div>
+                                        <div class="settings-row-control">
+                                            <label class="toggle">
+                                                <input
+                                                    type="checkbox"
+                                                    id="stg-proxy-enabled"
+                                                />
+                                                <span
+                                                    class="toggle-slider"
+                                                ></span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div id="proxy-fields" class="proxy-fields">
+                                        <!-- Type -->
+                                        <div class="settings-row">
+                                            <div class="settings-row-info">
+                                                <div class="settings-row-label">
+                                                    Proxy Type
+                                                </div>
+                                                <div class="settings-row-desc">
+                                                    Protocol used to connect to
+                                                    the proxy
+                                                </div>
+                                            </div>
+                                            <div class="settings-row-control">
+                                                <select
+                                                    class="form-input stg-input"
+                                                    id="stg-proxy-type"
+                                                >
+                                                    <option value="socks5">
+                                                        SOCKS5
+                                                    </option>
+                                                    <option value="socks4">
+                                                        SOCKS4
+                                                    </option>
+                                                    <option value="http">
+                                                        HTTP CONNECT
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <!-- Host + Port -->
+                                        <div class="settings-row">
+                                            <div class="settings-row-info">
+                                                <div class="settings-row-label">
+                                                    Proxy Host &amp; Port
+                                                </div>
+                                                <div class="settings-row-desc">
+                                                    Hostname or IP address of
+                                                    the proxy server
+                                                </div>
+                                            </div>
+                                            <div
+                                                class="settings-row-control settings-host-port"
+                                            >
+                                                <input
+                                                    class="form-input stg-input"
+                                                    id="stg-proxy-host"
+                                                    placeholder="127.0.0.1"
+                                                    type="text"
+                                                />
+                                                <input
+                                                    class="form-input stg-input stg-port"
+                                                    id="stg-proxy-port"
+                                                    placeholder="1080"
+                                                    type="number"
+                                                    min="1"
+                                                    max="65535"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <!-- Auth -->
+                                        <div class="settings-row">
+                                            <div class="settings-row-info">
+                                                <div class="settings-row-label">
+                                                    Proxy Authentication
+                                                </div>
+                                                <div class="settings-row-desc">
+                                                    Leave blank if the proxy
+                                                    requires no authentication
+                                                </div>
+                                            </div>
+                                            <div
+                                                class="settings-row-control settings-auth-pair"
+                                            >
+                                                <input
+                                                    class="form-input stg-input"
+                                                    id="stg-proxy-username"
+                                                    placeholder="Username (optional)"
+                                                    type="text"
+                                                    autocomplete="off"
+                                                />
+                                                <input
+                                                    class="form-input stg-input"
+                                                    id="stg-proxy-password"
+                                                    placeholder="Password (optional)"
+                                                    type="password"
+                                                    autocomplete="new-password"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <!-- Test -->
+                                        <div
+                                            class="settings-row settings-row-actions"
+                                        >
+                                            <div class="settings-row-info">
+                                                <div class="settings-row-label">
+                                                    Test Connection
+                                                </div>
+                                                <div class="settings-row-desc">
+                                                    Verify proxy is reachable
+                                                    before connecting to servers
+                                                </div>
+                                            </div>
+                                            <div class="settings-row-control">
+                                                <button
+                                                    class="btn btn-ghost"
+                                                    id="btn-test-proxy"
+                                                    style="
+                                                        display: inline-flex;
+                                                        align-items: center;
+                                                        gap: 6px;
+                                                    "
+                                                >
+                                                    <svg
+                                                        width="14"
+                                                        height="14"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        aria-hidden="true"
+                                                    >
+                                                        <path
+                                                            d="M10.5 4.5C7.19 4.5 4.5 7.19 4.5 10.5C4.5 13.81 7.19 16.5 10.5 16.5C11.93 16.5 13.24 16 14.27 15.17L18.3 19.2L19.2 18.3L15.17 14.27C16 13.24 16.5 11.93 16.5 10.5C16.5 7.19 13.81 4.5 10.5 4.5Z"
+                                                            fill="currentColor"
+                                                        />
+                                                    </svg>
+                                                    Test Proxy
+                                                </button>
+                                                <span
+                                                    id="proxy-test-result"
+                                                    class="proxy-test-result"
+                                                ></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Save -->
+                            <div class="settings-save-row">
+                                <button
+                                    class="btn btn-primary"
+                                    id="btn-save-settings"
+                                    style="
+                                        display: inline-flex;
+                                        align-items: center;
+                                        gap: 6px;
+                                    "
+                                >
+                                    <svg
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            d="M5 4H17L20 7V20H4V5C4 4.45 4.45 4 5 4Z"
+                                            fill="currentColor"
+                                        />
+                                        <rect
+                                            x="7"
+                                            y="4"
+                                            width="8"
+                                            height="5"
+                                            fill="white"
+                                            fill-opacity="0.55"
+                                        />
+                                        <rect
+                                            x="7"
+                                            y="14"
+                                            width="10"
+                                            height="4"
+                                            fill="white"
+                                            fill-opacity="0.35"
+                                        />
+                                    </svg>
+                                    Save Settings
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- About page -->
+                    <div class="page" id="page-about">
+                        <div class="page-header">
+                            <div>
+                                <div class="page-title">About SYNS Man</div>
+                                <div class="page-sub">SSH / SFTP Manager</div>
+                            </div>
+                        </div>
+
+                        <!-- About tabs -->
+                        <div class="about-tabs">
+                            <button
+                                class="about-tab active"
+                                data-tab="overview"
+                            >
+                                Overview
+                            </button>
+                            <button class="about-tab" data-tab="changelog">
+                                Changelog
+                            </button>
+                            <button class="about-tab" data-tab="whats-new">
+                                What's New
+                            </button>
+                        </div>
+
+                        <!-- Tab: Overview -->
+                        <div
+                            class="about-tab-panel active"
+                            id="about-tab-overview"
+                        >
+                            <div class="about-wrap">
+                                <div class="about-card about-hero">
+                                    <div class="about-logo">
+                                        <img
+                                            src="assets/icon.png"
+                                            alt="SYNS Man"
+                                            onerror="
+                                                this.style.display = 'none'
+                                            "
+                                        />
+                                    </div>
+                                    <div>
+                                        <h2 class="about-name">SYNS Man</h2>
+                                        <div class="about-tag">
+                                            Modern SSH / SFTP Manager for
+                                            Developers &amp; SysAdmins
+                                        </div>
+                                        <div class="about-version">
+                                            Version
+                                            <span id="about-version"
+                                                >1.0.2</span
+                                            >
+                                            <span
+                                                class="about-build"
+                                                id="about-platform"
+                                            ></span>
+                                        </div>
+                                        <div class="about-actions">
+                                            <button
+                                                class="btn btn-primary"
+                                                id="btn-check-update"
+                                            >
+                                                <svg
+                                                    width="14"
+                                                    height="14"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    aria-hidden="true"
+                                                    style="margin-right: 6px"
+                                                >
+                                                    <path
+                                                        d="M12 5C8.13 5 5 8.13 5 12H2L6 16L10 12H7C7 9.24 9.24 7 12 7C13.66 7 15.13 7.81 16.04 9.04L17.5 7.58C16.22 6 14.21 5 12 5ZM18 8L14 12H17C17 14.76 14.76 17 12 17C10.34 17 8.87 16.19 7.96 14.96L6.5 16.42C7.78 18 9.79 19 12 19C15.87 19 19 15.87 19 12H22L18 8Z"
+                                                        fill="currentColor"
+                                                    />
+                                                </svg>
+                                                Check for Updates
+                                            </button>
+                                            <button
+                                                class="btn btn-ghost"
+                                                id="btn-install-update"
+                                                disabled
+                                            >
+                                                Install Update
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="about-grid">
+                                    <div class="about-card">
+                                        <h3 class="about-section-title">
+                                            Features
+                                        </h3>
+                                        <ul class="about-list">
+                                            <li>
+                                                🖥️ Secure SSH terminal sessions
+                                            </li>
+                                            <li>
+                                                📁 Full SFTP file manager
+                                                (upload / download / edit)
+                                            </li>
+                                            <li>
+                                                🔑 Password &amp; SSH-Key
+                                                authentication
+                                            </li>
+                                            <li>
+                                                📝 Built-in remote file editor
+                                                (CodeMirror)
+                                            </li>
+                                            <li>
+                                                🗂️ Multiple saved servers with
+                                                quick connect
+                                            </li>
+                                            <li>
+                                                🔒 Encrypted local credential
+                                                storage
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="about-card">
+                                        <h3 class="about-section-title">
+                                            Runtime
+                                        </h3>
+                                        <ul class="about-list about-tech">
+                                            <li>
+                                                <span>App Version</span
+                                                ><b id="about-app-ver">—</b>
+                                            </li>
+                                            <li>
+                                                <span>Electron</span
+                                                ><b id="about-electron-ver"
+                                                    >—</b
+                                                >
+                                            </li>
+                                            <li>
+                                                <span>Chromium</span
+                                                ><b id="about-chrome-ver">—</b>
+                                            </li>
+                                            <li>
+                                                <span>Node.js</span
+                                                ><b id="about-node-ver">—</b>
+                                            </li>
+                                            <li>
+                                                <span>Platform</span
+                                                ><b id="about-platform-name"
+                                                    >—</b
+                                                >
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="about-card">
+                                        <h3 class="about-section-title">
+                                            Update Status
+                                        </h3>
+                                        <ul class="about-list about-tech">
+                                            <li>
+                                                <span>Stage</span
+                                                ><b id="about-update-stage"
+                                                    >—</b
+                                                >
+                                            </li>
+                                            <li>
+                                                <span>Current Version</span
+                                                ><b id="about-update-current"
+                                                    >—</b
+                                                >
+                                            </li>
+                                            <li>
+                                                <span>Available Version</span
+                                                ><b id="about-update-available"
+                                                    >—</b
+                                                >
+                                            </li>
+                                        </ul>
+                                        <div
+                                            class="about-update-msg"
+                                            id="about-update-message"
+                                        >
+                                            Update service is ready
+                                        </div>
+                                        <div class="about-update-progress">
+                                            <div
+                                                class="about-update-progress-fill"
+                                                id="about-update-progress-fill"
+                                            ></div>
+                                        </div>
+                                        <div
+                                            class="about-update-progress-text"
+                                            id="about-update-progress-text"
+                                        >
+                                            0%
+                                        </div>
+                                    </div>
+
+                                    <div class="about-card">
+                                        <h3 class="about-section-title">
+                                            Developer
+                                        </h3>
+                                        <div class="about-dev">
+                                            <div class="about-dev-name">
+                                                SYNS Man Team
+                                            </div>
+                                            <div class="about-dev-desc">
+                                                Built with ❤️ using Electron,
+                                                Node.js &amp; ssh2.
+                                            </div>
+                                            <div class="about-links">
+                                                <a
+                                                    href="#"
+                                                    class="about-link"
+                                                    data-ext="https://aljup.com"
+                                                >
+                                                    🌐 <span>aljup.com</span>
+                                                </a>
+                                                <a
+                                                    href="#"
+                                                    class="about-link"
+                                                    data-ext="mailto:admin@aljup.com"
+                                                >
+                                                    ✉️
+                                                    <span>admin@aljup.com</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="about-card">
+                                        <h3 class="about-section-title">
+                                            Legal
+                                        </h3>
+                                        <div class="about-legal">
+                                            <p>
+                                                © 2026 SYNS Man. All rights
+                                                reserved.
+                                            </p>
+                                            <p>
+                                                Licensed under the ISC License.
+                                            </p>
+                                            <p class="about-warn">
+                                                ⚠️ This software handles
+                                                sensitive credentials. Use only
+                                                on trusted machines.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /tab overview -->
+
+                        <!-- Tab: Changelog -->
+                        <div class="about-tab-panel" id="about-tab-changelog">
+                            <div class="about-wrap">
+                                <div class="cl-entry">
+                                    <div class="cl-header">
+                                        <span class="cl-version">v1.0.2</span>
+                                        <span class="cl-date"
+                                            >May 01, 2026</span
+                                        >
+                                        <span class="cl-badge cl-badge-latest"
+                                            >Latest</span
+                                        >
+                                    </div>
+                                    <ul class="cl-list">
+                                        <li class="cl-fix">
+                                            🔧 Fixed startup crash in
+                                            <code>main.js</code> (unexpected end
+                                            of input)
+                                        </li>
+                                        <li class="cl-feat">
+                                            ✨ Added realtime updater flow
+                                            (check, download progress, install)
+                                        </li>
+                                        <li class="cl-feat">
+                                            ✨ Added live update status card in
+                                            About page (stage, versions,
+                                            progress)
+                                        </li>
+                                        <li class="cl-fix">
+                                            🔧 Improved startup window sizing to
+                                            fit different screens and DPI scales
+                                        </li>
+                                        <li class="cl-feat">
+                                            ✨ Added version sync &amp; release
+                                            scripts and aligned project to
+                                            <code>v1.0.2</code>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="cl-entry">
+                                    <div class="cl-header">
+                                        <span class="cl-version">v1.0.0</span>
+                                        <span class="cl-date"
+                                            >April 29, 2026</span
+                                        >
+                                        <span class="cl-badge cl-badge-pre"
+                                            >Stable</span
+                                        >
+                                    </div>
+                                    <ul class="cl-list">
+                                        <li class="cl-feat">
+                                            ✨ Theme toggle — Dark &amp; Light
+                                            mode with persistent preference
+                                        </li>
+                                        <li class="cl-feat">
+                                            ✨ About page — tabs (Overview ·
+                                            Changelog · What's New) with runtime
+                                            info
+                                        </li>
+                                        <li class="cl-feat">
+                                            ✨ Sidebar: Settings (soon) &amp;
+                                            About links added
+                                        </li>
+                                        <li class="cl-feat">
+                                            ✨ Port field moved next to
+                                            Authentication selector
+                                        </li>
+                                        <li class="cl-fix">
+                                            🔧 Private Key path placeholder
+                                            adapts to OS (Linux / macOS /
+                                            Windows)
+                                        </li>
+                                        <li class="cl-fix">
+                                            🔧 Fixed black screen caused by
+                                            preload sandbox incompatibility
+                                        </li>
+                                        <li class="cl-feat">
+                                            ✨ All form fields now equal width
+                                            with overflow protection
+                                        </li>
+                                        <li class="cl-feat">
+                                            ✨ Initial public release — SSH
+                                            &amp; SFTP manager
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="cl-entry">
+                                    <div class="cl-header">
+                                        <span class="cl-version">v0.9.0</span>
+                                        <span class="cl-date"
+                                            >April 15, 2026</span
+                                        >
+                                        <span class="cl-badge cl-badge-pre"
+                                            >Beta</span
+                                        >
+                                    </div>
+                                    <ul class="cl-list">
+                                        <li class="cl-feat">
+                                            ✨ SFTP file manager — upload,
+                                            download, delete, rename, chmod
+                                        </li>
+                                        <li class="cl-feat">
+                                            ✨ In-app file editor using
+                                            CodeMirror with syntax highlighting
+                                        </li>
+                                        <li class="cl-feat">
+                                            ✨ SFTP path history panel
+                                        </li>
+                                        <li class="cl-fix">
+                                            🔧 SSH terminal resize support
+                                            (xterm-addon-fit)
+                                        </li>
+                                        <li class="cl-fix">
+                                            🔧 Session persistence across app
+                                            restarts
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="cl-entry">
+                                    <div class="cl-header">
+                                        <span class="cl-version">v0.5.0</span>
+                                        <span class="cl-date"
+                                            >March 28, 2026</span
+                                        >
+                                        <span class="cl-badge cl-badge-pre"
+                                            >Alpha</span
+                                        >
+                                    </div>
+                                    <ul class="cl-list">
+                                        <li class="cl-feat">
+                                            ✨ SSH terminal via xterm.js
+                                        </li>
+                                        <li class="cl-feat">
+                                            ✨ Server manager — add, edit,
+                                            delete, quick connect
+                                        </li>
+                                        <li class="cl-feat">
+                                            ✨ Password &amp; SSH Key
+                                            authentication
+                                        </li>
+                                        <li class="cl-feat">
+                                            ✨ Encrypted credential storage with
+                                            bcryptjs
+                                        </li>
+                                        <li class="cl-feat">
+                                            ✨ Custom frameless window with
+                                            traffic-light controls
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /tab changelog -->
+
+                        <!-- Tab: What's New -->
+                        <div class="about-tab-panel" id="about-tab-whats-new">
+                            <div class="about-wrap">
+                                <div class="wn-hero">
+                                    <div class="wn-version-badge">v1.0.2</div>
+                                    <h2 class="wn-title">
+                                        What's New in SYNS Man
+                                    </h2>
+                                    <p class="wn-sub">
+                                        Here's everything added and improved in
+                                        the latest release.
+                                    </p>
+                                </div>
+
+                                <div class="wn-grid">
+                                    <div class="wn-card">
+                                        <div class="wn-icon">🌓</div>
+                                        <div>
+                                            <div class="wn-card-title">
+                                                Dark &amp; Light Theme
+                                            </div>
+                                            <div class="wn-card-desc">
+                                                Switch between dark and light
+                                                modes instantly. Your preference
+                                                is saved and restored on every
+                                                launch.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="wn-card">
+                                        <div class="wn-icon">ℹ️</div>
+                                        <div>
+                                            <div class="wn-card-title">
+                                                Redesigned About Page
+                                            </div>
+                                            <div class="wn-card-desc">
+                                                New tabbed About page with
+                                                runtime details, full changelog,
+                                                and What's New section.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="wn-card">
+                                        <div class="wn-icon">⚙️</div>
+                                        <div>
+                                            <div class="wn-card-title">
+                                                Settings (Coming Soon)
+                                            </div>
+                                            <div class="wn-card-desc">
+                                                Settings panel is in
+                                                development. Expect theme
+                                                controls, default port, and
+                                                keyboard shortcuts.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="wn-card">
+                                        <div class="wn-icon">🔑</div>
+                                        <div>
+                                            <div class="wn-card-title">
+                                                Smarter Key Path Input
+                                            </div>
+                                            <div class="wn-card-desc">
+                                                Private key path placeholder now
+                                                shows the correct default path
+                                                for your operating system
+                                                (Linux, macOS, Windows).
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="wn-card">
+                                        <div class="wn-icon">📐</div>
+                                        <div>
+                                            <div class="wn-card-title">
+                                                Improved Add-Server Form
+                                            </div>
+                                            <div class="wn-card-desc">
+                                                Port moved next to
+                                                Authentication for a cleaner
+                                                layout. All fields are now equal
+                                                width and contained.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="wn-card">
+                                        <div class="wn-icon">🐛</div>
+                                        <div>
+                                            <div class="wn-card-title">
+                                                Black Screen Fix
+                                            </div>
+                                            <div class="wn-card-desc">
+                                                Resolved a preload sandbox crash
+                                                that caused a blank screen on
+                                                first launch after install.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /tab whats-new -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add/Edit Server Modal -->
+        <div class="modal-overlay" id="modal-server">
+            <div class="modal">
+                <div class="modal-header">
+                    <span class="modal-title" id="modal-server-title"
+                        >Add Server</span
+                    >
+                    <button class="modal-close" id="modal-server-close">
+                        ✕
+                    </button>
+                </div>
+                <form id="form-server">
+                    <div class="form-group">
+                        <label class="form-label">Name</label>
+                        <input
+                            class="form-input"
+                            name="name"
+                            placeholder="Production Web Server"
+                            required
+                        />
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Host</label>
+                            <input
+                                class="form-input"
+                                name="host"
+                                placeholder="192.168.1.1"
+                                required
+                            />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Username</label>
+                            <input
+                                class="form-input"
+                                name="username"
+                                placeholder="root"
+                                required
+                            />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Authentication</label>
+                            <select
+                                class="form-input"
+                                name="auth_type"
+                                id="auth-type-select"
+                            >
+                                <option value="password">Password</option>
+                                <option value="key">SSH Key</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Port</label>
+                            <input
+                                class="form-input"
+                                name="port"
+                                type="number"
+                                value="22"
+                                min="1"
+                                max="65535"
+                            />
+                        </div>
+                    </div>
+                    <div id="auth-password-section">
+                        <div class="form-group">
+                            <label class="form-label">Password</label>
+                            <input
+                                class="form-input"
+                                name="password"
+                                type="password"
+                                placeholder="••••••••"
+                                autocomplete="new-password"
+                            />
+                        </div>
+                    </div>
+                    <div id="auth-key-section" style="display: none">
+                        <div class="form-group">
+                            <label class="form-label">Private Key Path</label>
+                            <div class="input-browse">
+                                <input
+                                    class="form-input"
+                                    name="key_path"
+                                    id="key-path-input"
+                                    placeholder="C:\Users\you\.ssh\id_ed25519"
+                                    readonly
+                                />
+                                <button
+                                    type="button"
+                                    class="btn btn-ghost btn-sm"
+                                    id="btn-browse-key"
+                                >
+                                    Browse…
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"
+                                >Passphrase
+                                <span
+                                    style="
+                                        color: var(--text2);
+                                        font-weight: 400;
+                                    "
+                                    >(optional)</span
+                                ></label
+                            >
+                            <input
+                                class="form-input"
+                                name="passphrase"
+                                type="password"
+                                placeholder="••••••••"
+                                autocomplete="new-password"
+                            />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-ghost"
+                            id="btn-modal-cancel"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                            id="btn-save-server"
+                        >
+                            Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Toast notification -->
+        <div id="sftp-toast" class="sftp-toast"></div>
+
+        <!-- CodeMirror -->
+        <link
+            rel="stylesheet"
+            href="../node_modules/codemirror/lib/codemirror.css"
+        />
+        <link
+            rel="stylesheet"
+            href="../node_modules/codemirror/theme/dracula.css"
+        />
+        <link
+            rel="stylesheet"
+            href="../node_modules/codemirror/addon/fold/foldgutter.css"
+        />
+        <script src="../node_modules/codemirror/lib/codemirror.js"></script>
+        <script src="../node_modules/codemirror/addon/edit/matchbrackets.js"></script>
+        <script src="../node_modules/codemirror/addon/edit/closebrackets.js"></script>
+        <script src="../node_modules/codemirror/addon/fold/foldcode.js"></script>
+        <script src="../node_modules/codemirror/addon/fold/foldgutter.js"></script>
+        <script src="../node_modules/codemirror/addon/fold/brace-fold.js"></script>
+        <script src="../node_modules/codemirror/addon/fold/indent-fold.js"></script>
+        <script src="../node_modules/codemirror/addon/selection/active-line.js"></script>
+        <link
+            rel="stylesheet"
+            href="../node_modules/codemirror/addon/dialog/dialog.css"
+        />
+        <link
+            rel="stylesheet"
+            href="../node_modules/codemirror/addon/display/fullscreen.css"
+        />
+        <link
+            rel="stylesheet"
+            href="../node_modules/codemirror/addon/search/matchesonscrollbar.css"
+        />
+        <script src="../node_modules/codemirror/addon/dialog/dialog.js"></script>
+        <script src="../node_modules/codemirror/addon/search/searchcursor.js"></script>
+        <script src="../node_modules/codemirror/addon/search/search.js"></script>
+        <script src="../node_modules/codemirror/addon/search/jump-to-line.js"></script>
+        <script src="../node_modules/codemirror/addon/search/match-highlighter.js"></script>
+        <script src="../node_modules/codemirror/addon/search/matchesonscrollbar.js"></script>
+        <script src="../node_modules/codemirror/addon/comment/comment.js"></script>
+        <script src="../node_modules/codemirror/addon/display/fullscreen.js"></script>
+        <script src="../node_modules/codemirror/mode/javascript/javascript.js"></script>
+        <script src="../node_modules/codemirror/mode/css/css.js"></script>
+        <script src="../node_modules/codemirror/mode/xml/xml.js"></script>
+        <script src="../node_modules/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+        <script src="../node_modules/codemirror/mode/clike/clike.js"></script>
+        <script src="../node_modules/codemirror/mode/php/php.js"></script>
+        <script src="../node_modules/codemirror/mode/python/python.js"></script>
+        <script src="../node_modules/codemirror/mode/shell/shell.js"></script>
+        <script src="../node_modules/codemirror/mode/sql/sql.js"></script>
+        <script src="../node_modules/codemirror/mode/yaml/yaml.js"></script>
+        <script src="../node_modules/codemirror/mode/markdown/markdown.js"></script>
+
+        <script src="../node_modules/xterm/lib/xterm.js"></script>
+        <link rel="stylesheet" href="../node_modules/xterm/css/xterm.css" />
+        <script src="../node_modules/xterm-addon-fit/lib/xterm-addon-fit.js"></script>
+
+        <!-- SFTP Context Menu -->
+        <div id="ctx-menu" class="ctx-menu" style="display: none">
+            <div class="ctx-item" id="ctx-edit">&#x270F;&#xFE0F; Edit File</div>
+            <div class="ctx-item" id="ctx-download">
+                &#x2B07;&#xFE0F; Download
+            </div>
+            <div class="ctx-item" id="ctx-rename">&#x1F4DD; Rename</div>
+            <div class="ctx-item" id="ctx-chmod">&#x1F512; Permissions</div>
+            <div class="ctx-item" id="ctx-compress">
+                &#x1F4E6; Compress to .zip
+            </div>
+            <div class="ctx-item" id="ctx-extract">&#x1F4C2; Extract Here</div>
+            <div class="ctx-divider"></div>
+            <div class="ctx-item ctx-danger" id="ctx-delete">
+                &#x1F5D1;&#xFE0F; Delete
+            </div>
+        </div>
+
+        <!-- SFTP File Editor Modal -->
+        <div class="modal-overlay" id="modal-editor">
+            <div class="modal modal-editor-inner">
+                <div class="modal-header">
+                    <div
+                        style="
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                            min-width: 0;
+                        "
+                    >
+                        <span
+                            class="modal-title"
+                            id="editor-title"
+                            style="
+                                white-space: nowrap;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                max-width: 400px;
+                            "
+                            >Edit File</span
+                        >
+                        <span
+                            id="editor-lang-badge"
+                            class="badge badge-blue"
+                            style="font-size: 10px; flex-shrink: 0"
+                        ></span>
+                    </div>
+                    <div
+                        style="
+                            display: flex;
+                            gap: 8px;
+                            align-items: center;
+                            flex-shrink: 0;
+                        "
+                    >
+                        <span
+                            id="editor-cursor-pos"
+                            style="
+                                font-size: 11px;
+                                color: var(--text2);
+                                font-family: Consolas, monospace;
+                                min-width: 90px;
+                                text-align: right;
+                            "
+                        ></span>
+                        <button
+                            class="btn btn-primary btn-sm"
+                            id="btn-editor-save"
+                        >
+                            &#x1F4BE; Save
+                        </button>
+                        <button class="modal-close" id="editor-close">
+                            &#x2715;
+                        </button>
+                    </div>
+                </div>
+                <div id="editor-alert"></div>
+
+                <!-- Editor Toolbar -->
+                <div id="editor-toolbar">
+                    <div class="editor-tb-group">
+                        <button
+                            class="editor-tb-btn"
+                            id="editor-undo"
+                            title="Undo (Ctrl+Z)"
+                        >
+                            &#x21A9;
+                        </button>
+                        <button
+                            class="editor-tb-btn"
+                            id="editor-redo"
+                            title="Redo (Ctrl+Y)"
+                        >
+                            &#x21AA;
+                        </button>
+                    </div>
+                    <div class="editor-tb-sep"></div>
+                    <div class="editor-tb-group">
+                        <button
+                            class="editor-tb-btn"
+                            id="editor-find"
+                            title="Find (Ctrl+F)"
+                        >
+                            &#x1F50D; Find
+                        </button>
+                        <button
+                            class="editor-tb-btn"
+                            id="editor-replace"
+                            title="Find &amp; Replace (Ctrl+H)"
+                        >
+                            &#x21C4; Replace
+                        </button>
+                        <button
+                            class="editor-tb-btn"
+                            id="editor-goto"
+                            title="Go to Line (Alt+G)"
+                        >
+                            &#x2316; Line
+                        </button>
+                    </div>
+                    <div class="editor-tb-sep"></div>
+                    <div class="editor-tb-group">
+                        <button
+                            class="editor-tb-btn"
+                            id="editor-comment"
+                            title="Toggle Comment (Ctrl+/)"
+                        >
+                            <span
+                                style="
+                                    font-family: Consolas, monospace;
+                                    letter-spacing: -1px;
+                                "
+                                >//</span
+                            >
+                            Comment
+                        </button>
+                        <button
+                            class="editor-tb-btn"
+                            id="editor-indent-all"
+                            title="Re-indent All Lines"
+                        >
+                            &#x21E5; Indent
+                        </button>
+                        <button
+                            class="editor-tb-btn"
+                            id="editor-select-all"
+                            title="Select All (Ctrl+A)"
+                        >
+                            &#x25A3; All
+                        </button>
+                    </div>
+                    <div class="editor-tb-sep"></div>
+                    <div class="editor-tb-group">
+                        <button
+                            class="editor-tb-btn"
+                            id="editor-wrap"
+                            title="Toggle Word Wrap"
+                        >
+                            &#x21B5; Wrap
+                        </button>
+                        <button
+                            class="editor-tb-btn"
+                            id="editor-fullscreen"
+                            title="Toggle Fullscreen (F11)"
+                        >
+                            &#x26F6;
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Find & Replace Panel -->
+                <div id="editor-replace-panel" style="display: none">
+                    <div class="er-row">
+                        <div class="er-field">
+                            <span class="er-label">Find</span>
+                            <input
+                                class="er-input"
+                                id="er-find"
+                                placeholder="Search&#x2026;"
+                                autocomplete="off"
+                                spellcheck="false"
+                            />
+                        </div>
+                        <div class="er-field">
+                            <span class="er-label">Replace</span>
+                            <input
+                                class="er-input"
+                                id="er-replace-val"
+                                placeholder="Replace with&#x2026;"
+                                autocomplete="off"
+                                spellcheck="false"
+                            />
+                        </div>
+                        <div class="er-options">
+                            <label class="er-cb" title="Case sensitive"
+                                ><input type="checkbox" id="er-case" />Aa</label
+                            >
+                            <label class="er-cb" title="Regular expression"
+                                ><input
+                                    type="checkbox"
+                                    id="er-regex"
+                                />.*</label
+                            >
+                        </div>
+                        <div class="er-btns">
+                            <button
+                                class="editor-tb-btn"
+                                id="er-prev"
+                                title="Previous (Shift+Enter)"
+                            >
+                                &#x25B2;
+                            </button>
+                            <button
+                                class="editor-tb-btn"
+                                id="er-next"
+                                title="Next (Enter)"
+                            >
+                                &#x25BC; Next
+                            </button>
+                            <span id="er-status" class="er-status"></span>
+                            <button class="editor-tb-btn" id="er-rep-one">
+                                Replace
+                            </button>
+                            <button class="editor-tb-btn" id="er-rep-all">
+                                Replace All
+                            </button>
+                            <button
+                                class="editor-tb-btn"
+                                id="er-close-panel"
+                                title="Close (Esc)"
+                            >
+                                &#x2715;
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="editor-cm-host"></div>
+            </div>
+        </div>
+
+        <!-- SFTP Chmod Modal -->
+        <div class="modal-overlay" id="modal-chmod">
+            <div class="modal" style="width: 360px">
+                <div class="modal-header">
+                    <span class="modal-title">Permissions</span>
+                    <button class="modal-close" id="chmod-close">✕</button>
+                </div>
+                <div id="chmod-alert"></div>
+                <p
+                    id="chmod-filepath"
+                    style="
+                        font-size: 12px;
+                        color: var(--text2);
+                        font-family: Consolas, monospace;
+                        margin-bottom: 16px;
+                        word-break: break-all;
+                    "
+                ></p>
+                <div class="chmod-grid">
+                    <div class="chmod-header">
+                        <span></span><span>Read</span><span>Write</span
+                        ><span>Exec</span>
+                    </div>
+                    <div class="chmod-row">
+                        <span>Owner</span>
+                        <input type="checkbox" id="chmod-ur" /><input
+                            type="checkbox"
+                            id="chmod-uw"
+                        /><input type="checkbox" id="chmod-ux" />
+                    </div>
+                    <div class="chmod-row">
+                        <span>Group</span>
+                        <input type="checkbox" id="chmod-gr" /><input
+                            type="checkbox"
+                            id="chmod-gw"
+                        /><input type="checkbox" id="chmod-gx" />
+                    </div>
+                    <div class="chmod-row">
+                        <span>Other</span>
+                        <input type="checkbox" id="chmod-or" /><input
+                            type="checkbox"
+                            id="chmod-ow"
+                        /><input type="checkbox" id="chmod-ox" />
+                    </div>
+                </div>
+                <div
+                    style="
+                        margin-top: 12px;
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                    "
+                >
+                    <label class="form-label" style="margin: 0">Octal:</label>
+                    <input
+                        class="form-input"
+                        id="chmod-octal"
+                        style="width: 80px; font-family: Consolas, monospace"
+                        maxlength="4"
+                        placeholder="755"
+                    />
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-ghost" id="chmod-cancel">
+                        Cancel
+                    </button>
+                    <button class="btn btn-primary" id="btn-chmod-apply">
+                        Apply
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SFTP Rename Modal -->
+        <div class="modal-overlay" id="modal-rename">
+            <div class="modal" style="width: 380px">
+                <div class="modal-header">
+                    <span class="modal-title">Rename</span>
+                    <button class="modal-close" id="rename-close">✕</button>
+                </div>
+                <div id="rename-alert"></div>
+                <div class="form-group">
+                    <label class="form-label">New name</label>
+                    <input
+                        class="form-input"
+                        id="rename-input"
+                        placeholder="newname.txt"
+                    />
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-ghost" id="rename-cancel">
+                        Cancel
+                    </button>
+                    <button class="btn btn-primary" id="btn-rename-apply">
+                        Rename
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upload Modal -->
+        <input
+            type="file"
+            id="upload-file-input"
+            multiple
+            style="display: none"
+        />
+        <div class="modal-overlay" id="modal-upload">
+            <div class="modal modal-upload-inner">
+                <div class="modal-header">
+                    <div
+                        style="
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                            min-width: 0;
+                        "
+                    >
+                        <span class="modal-title">Upload Files</span>
+                        <span
+                            id="upload-dest-label"
+                            style="
+                                font-size: 11px;
+                                color: var(--text2);
+                                font-family: Consolas, monospace;
+                                white-space: nowrap;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                max-width: 260px;
+                            "
+                        ></span>
+                    </div>
+                    <button class="modal-close" id="upload-close">
+                        &#x2715;
+                    </button>
+                </div>
+
+                <!-- Drop zone -->
+                <div id="upload-dropzone" class="upload-dropzone">
+                    <div class="upload-drop-icon">&#x2B06;</div>
+                    <div class="upload-drop-text">Drop files here</div>
+                    <div class="upload-drop-sub">or</div>
+                    <button class="btn btn-ghost btn-sm" id="upload-browse-btn">
+                        Browse Files&#x2026;
+                    </button>
+                </div>
+
+                <!-- File list (scrollable) -->
+                <div id="upload-file-list">
+                    <div id="upload-items"></div>
+                </div>
+
+                <!-- Footer -->
+                <div
+                    class="modal-footer"
+                    id="upload-footer"
+                    style="display: none"
+                >
+                    <span
+                        id="upload-summary"
+                        style="font-size: 12px; color: var(--text2); flex: 1"
+                    ></span>
+                    <button class="btn btn-ghost" id="upload-cancel-btn">
+                        Cancel
+                    </button>
+                    <button class="btn btn-primary" id="upload-start-btn">
+                        &#x2B06; Upload
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script src="js/auth-pages.js"></script>
+        <script src="js/app.js"></script>
+    </body>
+</html>
