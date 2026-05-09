@@ -247,16 +247,30 @@ function setupCoreIpc() {
   });
 
   ipcMain.handle("dialog:openKeyFile", async () => {
+    const os = require("os");
+    const sshDir = path.join(os.homedir(), ".ssh");
+    let defaultPath;
+    try {
+      require("fs").accessSync(sshDir);
+      defaultPath = sshDir;
+    } catch {
+      defaultPath = os.homedir();
+    }
     const result = await dialog.showOpenDialog(mainWindow, {
-      title: "Select private key file",
+      title: "Select SSH private key",
+      defaultPath,
       properties: ["openFile"],
       filters: [
-        { name: "Key files", extensions: ["pem", "ppk", "key", "pub"] },
         { name: "All files", extensions: ["*"] },
       ],
     });
     if (result.canceled || !result.filePaths?.length) return null;
-    return result.filePaths[0];
+    const chosen = result.filePaths[0];
+    const lower = chosen.toLowerCase();
+    if (lower.endsWith(".pub") || lower.endsWith(".ppk")) {
+      return { error: "invalid", path: chosen };
+    }
+    return chosen;
   });
 
   ipcMain.handle("dialog:openUploadFiles", async () => {

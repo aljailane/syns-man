@@ -229,8 +229,13 @@ function bindStaticElements() {
   document
     .getElementById("btn-browse-key")
     .addEventListener("click", async () => {
-      const filePath = await window.syns.openKeyFile();
-      if (filePath) document.getElementById("key-path-input").value = filePath;
+      const result = await window.syns.openKeyFile();
+      if (!result) return;
+      if (typeof result === "object" && result.error === "invalid") {
+        showSftpToast("⚠️ Invalid key file. Please select a private key (not .pub or .ppk)", 4000);
+        return;
+      }
+      document.getElementById("key-path-input").value = result;
     });
 
   // Adjust private-key path placeholder based on OS

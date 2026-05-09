@@ -827,7 +827,7 @@
                                         <div class="about-version">
                                             Version
                                             <span id="about-version"
-                                                >1.0.20</span
+                                                >1.0.22</span
                                             >
                                             <span
                                                 class="about-build"
@@ -1140,20 +1140,23 @@
                             <label class="form-label">Private Key Path</label>
                             <div class="input-browse">
                                 <input
-                                    class="form-input"
+                                    class="form-input key-path-readonly"
                                     name="key_path"
                                     id="key-path-input"
-                                    placeholder="C:\Users\you\.ssh\id_ed25519"
+                                    placeholder="Click Browse or type path manually…"
                                     readonly
                                 />
                                 <button
                                     type="button"
-                                    class="btn btn-ghost btn-sm"
+                                    class="btn btn-browse-key"
                                     id="btn-browse-key"
+                                    title="Browse for SSH private key"
                                 >
-                                    Browse…
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                                    Browse
                                 </button>
                             </div>
+                            <span class="form-hint">Accepts: id_rsa, id_ed25519, id_ecdsa, *.pem — not .pub or .ppk</span>
                         </div>
                         <div class="form-group">
                             <label class="form-label"
