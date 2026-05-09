@@ -5,6 +5,58 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.0.22] - 2026-05-09
+
+### Added
+- SSH key Browse button: folder icon, accent-colored border (`btn-browse-key` class).
+- Hint text below key path input: «Accepts: id_rsa, id_ed25519, id_ecdsa, *.pem — not .pub or .ppk».
+- New CSS classes: `.btn-browse-key`, `.key-path-readonly`, `.form-hint`.
+
+### Fixed
+- SSH key file picker now opens `~/.ssh` by default and shows **all files** (including extensionless keys like `id_ed25519`).
+- Previous `extensions: ["pem", "key", ""]` caused the dialog to hide files; replaced with `extensions: ["*"]`.
+- Selecting a `.pub` or `.ppk` file now shows a warning toast instead of silently accepting.
+- Update notification: separated `_globalUpdateListenerBound` from `_globalUpdateNotifShown` flags so the banner correctly re-appears after login.
+
+---
+
+## [1.0.21] - 2026-05-09
+
+### Fixed
+- Removed deprecated `signingHashAlgorithms` and `certificateSubjectName` from `win` build config — caused electron-builder 26.x schema validation error.
+
+---
+
+## [1.0.20] - 2026-05-09
+
+### Changed
+- Removed macOS support entirely: `release-mac` job deleted from GitHub Actions workflow and `mac` section removed from `package.json`.
+- Build targets are now Linux (AppImage, deb, rpm) and Windows (nsis, portable) only.
+
+### Fixed
+- Version-from-tag step now runs correctly in both Linux and Windows CI jobs.
+
+---
+
+## [1.0.19] - 2026-05-09
+
+### Fixed
+- macOS build: added `CSC_IDENTITY_AUTO_DISCOVERY: false` to prevent code-signing failure when no certificate is configured.
+- CI: added "Set version from tag" step — artifact names now reflect the release tag instead of the version hardcoded in `package.json`.
+- Update detection: fixed logic that prevented the update notification banner from appearing on subsequent logins.
+
+---
+
+## [1.0.18] - 2026-05-09
+
+### Changed
+- GitHub Actions: upgraded `actions/checkout` to v6 and `actions/setup-node` to v6 with Node.js 24 to eliminate Node.js 20 deprecation warnings.
+
+### Fixed
+- Windows build environment: set `CSC_IDENTITY_AUTO_DISCOVERY: false` in CI to allow unsigned Windows builds without errors.
+
+---
+
 ## [1.0.17] - 2026-05-04
 
 ### Fixed
@@ -59,6 +111,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 - Eliminated checksum mismatch errors caused by the Windows auto-downloader.
 - GitHub Actions workflow restructured: each platform job creates/updates the GitHub Release independently (`overwrite: true`), eliminating race conditions between `latest.yml` and installer artifacts.
+
+---
+
+## [1.0.13] - 2026-05-03
+
+### Fixed
+- GitHub Actions workflow: added `overwrite: true` to release upload step — eliminates race conditions when multiple jobs upload artifacts to the same release.
+- Update check: gracefully handles 404 responses from the GitHub releases API instead of throwing an unhandled error.
+- Improved checksum error handling during update verification.
+
+---
+
+## [1.0.12] - 2026-05-03
+
+### Fixed
+- Windows artifact now uses an explicit `artifactName` with dashes (`SYNS-Man-Setup-${version}.${ext}`) to prevent spaces in filenames breaking download links.
 
 ---
 
@@ -147,6 +215,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.0.3] - 2026-04-30
+
+### Changed
+- Internal version bump; minor CI configuration adjustments prior to v1.0.4.
+
+---
+
 ## [1.0.2] - 2026-04-30
 
 ### Added
@@ -197,56 +272,3 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Password and SSH Key authentication.
 - Encrypted credential storage with `bcryptjs`.
 - Custom frameless window with traffic-light controls.
-
-
-### Added
-- In-app changelog now fetched live from GitHub (`CHANGELOG.md`) — always up to date without rebuilding.
-- Changelog tab shows a spinner while loading and a fallback "View on GitHub" link on network error.
-
-### Changed
-- Removed all hardcoded changelog entries from `index.html`; content is now fully dynamic.
-
-
-
-### Added
-- **Multi-color themes**: Ocean, Forest, Violet, and Rose themes added alongside existing Dark and Light.
-- **Remember username**: Login page now pre-fills the last used username with a transparent field style; includes a "change" link to reset it.
-
-### Changed
-- **Update system**: Removed auto-download (electron-updater). All platforms now use GitHub API for version checking only — a notification appears with a "Go to Releases" link when an update is available.
-- Update banner and action buttons now consistently point to GitHub Releases on all platforms.
-
-### Fixed
-- Eliminated checksum mismatch errors caused by the old Windows auto-downloader.
-- GitHub Actions workflow now creates Releases directly from each build job (no separate `create-release` step) preventing race conditions between `latest.yml` and installer artifacts.
-
-## [1.0.2] - 2026-05-01
-
-### Added
-- Realtime update flow using `electron-updater` (check, download progress, install).
-- About page update center with live status, current/available version, and progress bar.
-- Version/release workflow scripts:
-  - `version:sync`
-  - `release:patch`
-  - `release:minor`
-  - `release:major`
-  - `release:publish`
-  - `build:all`
-  - `update:dry`
-- New `scripts/sync-version.js` to synchronize version metadata.
-
-### Fixed
-- Startup crash in `main.js` (`SyntaxError: Unexpected end of input`).
-- Initial window size now adapts to screen/work area to avoid oversized window edges.
-
-### Changed
-- Project version bumped to `1.0.2`.
-- In-app changelog updated with `v1.0.2` entry.
-
-## [1.0.0] - 2026-04-29
-
-### Added
-- Initial public stable release.
-- SSH terminal manager.
-- SFTP file browser and operations.
-- Theme toggle and About tabs.
