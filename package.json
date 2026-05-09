@@ -50,10 +50,6 @@
       ],
       "icon": "renderer/assets/icon.ico",
       "artifactName": "SYNS-Man-Setup-${version}.${ext}",
-      "signingHashAlgorithms": [
-        "sha256"
-      ],
-      "certificateSubjectName": "SYNS Man",
       "verifyUpdateCodeSignature": false
     },
     "nsis": {
