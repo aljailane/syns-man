@@ -2173,7 +2173,6 @@ const REPO_RELEASES_URL = "https://github.com/aljailane/syns-man/releases";
 const CHANGELOG_RAW_URL = "https://raw.githubusercontent.com/aljailane/syns-man/main/CHANGELOG.md";
 
 /* ─── Changelog fetcher ──────────────────────────────────────────────── */
-let _clFetched = false;
 
 function _escapeHtml(str) {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -2247,7 +2246,6 @@ function _renderChangelogEntries(entries) {
 }
 
 async function loadChangelog() {
-  if (_clFetched) return;
   const loading = document.getElementById("cl-loading");
   const error = document.getElementById("cl-error");
   const entries = document.getElementById("cl-entries");
@@ -2260,6 +2258,9 @@ async function loadChangelog() {
     });
   }
 
+  if (loading) loading.style.display = "flex";
+  if (error) error.style.display = "none";
+
   try {
     const res = await fetch(CHANGELOG_RAW_URL, { cache: "no-cache" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -2267,7 +2268,6 @@ async function loadChangelog() {
     const parsed = _parseChangelog(text);
     if (loading) loading.style.display = "none";
     if (entries) entries.innerHTML = _renderChangelogEntries(parsed);
-    _clFetched = true;
   } catch (err) {
     if (loading) loading.style.display = "none";
     if (error) error.style.display = "block";
