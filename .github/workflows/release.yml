@@ -27,7 +27,7 @@ jobs:
         run: |
           TAG="${GITHUB_REF_NAME}"
           VERSION="${TAG#v}"
-          npm version "$VERSION" --no-git-tag-version
+          npm version "$VERSION" --no-git-tag-version --allow-same-version
           npm run version:sync
 
       - name: Build Linux packages
@@ -68,7 +68,7 @@ jobs:
         run: |
           TAG="${GITHUB_REF_NAME}"
           VERSION="${TAG#v}"
-          npm version "$VERSION" --no-git-tag-version
+          npm version "$VERSION" --no-git-tag-version --allow-same-version
           npm run version:sync
 
       - name: Build Windows packages
@@ -91,52 +91,5 @@ jobs:
             dist/*.exe
             dist/*.blockmap
             dist/latest.yml
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  release-mac:
-    runs-on: macos-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Set version from tag
-        run: |
-          TAG="${GITHUB_REF_NAME}"
-          VERSION="${TAG#v}"
-          npm version "$VERSION" --no-git-tag-version
-          npm run version:sync
-
-      - name: Build macOS packages
-        run: |
-          npx electron-builder --mac dmg zip --x64 --arm64 --publish never
-        env:
-          # Code signing — add MAC_CERT_P12 (base64), MAC_CERT_PASSWORD, APPLE_ID, APPLE_ID_PASSWORD, APPLE_TEAM_ID in repo Secrets
-          CSC_LINK: ${{ secrets.MAC_CERT_P12 }}
-          CSC_KEY_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_ID_PASS: ${{ secrets.APPLE_ID_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          CSC_IDENTITY_AUTO_DISCOVERY: false
-
-      - name: Upload macOS artifacts
-        uses: softprops/action-gh-release@v2
-        with:
-          draft: false
-          prerelease: false
-          generate_release_notes: true
-          overwrite: true
-          files: |
-            dist/*.dmg
-            dist/*.zip
-            dist/latest-mac.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

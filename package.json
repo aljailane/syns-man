@@ -1,6 +1,6 @@
 {
   "name": "syns",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "SSH / SFTP Manager",
   "homepage": "https://github.com/aljailane/syns-man",
   "repository": {
@@ -122,26 +122,6 @@
       ],
       "packageCategory": "net",
       "priority": "optional"
-    },
-    "mac": {
-      "target": [
-        {
-          "target": "dmg",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
-        },
-        {
-          "target": "zip",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
-        }
-      ],
-      "artifactName": "SYNS-Man-${version}-${arch}.${ext}",
-      "category": "public.app-category.developer-tools"
     }
   },
   "dependencies": {
