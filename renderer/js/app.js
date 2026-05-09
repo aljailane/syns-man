@@ -2554,10 +2554,10 @@ function initAboutPage() {
 
 /* ─── Global update listener ─────────────────────────────────────────── */
 let _globalUpdateNotifShown = false;
+let _globalUpdateListenerBound = false;
 
 function initGlobalUpdateListener() {
-  if (_globalUpdateNotifShown !== false && _globalUpdateNotifShown !== undefined) return;
-  // Reset per-login session
+  // Reset notification flag each login so users always see the update toast
   _globalUpdateNotifShown = false;
 
   function handleUpdateStatus(status) {
@@ -2566,8 +2566,7 @@ function initGlobalUpdateListener() {
     if (stage !== "available" && stage !== "downloaded") return;
     _globalUpdateNotifShown = true;
     const ver = status.updateInfo?.version ? ` v${status.updateInfo.version}` : "";
-    const isLinux = window.syns.platform === "linux";
-    const action = isLinux ? "View Releases in About page" : "Go to About page to install";
+    const action = "View Releases in About page";
     const msg =
       stage === "downloaded"
         ? `🔄 Update${ver} ready — restart to install`
@@ -2575,11 +2574,13 @@ function initGlobalUpdateListener() {
     showSftpToast(msg, 7000);
   }
 
-  if (window.syns.onUpdateStatus) {
+  // Only register the IPC listener once per app session (it persists across logins)
+  if (!_globalUpdateListenerBound && window.syns.onUpdateStatus) {
+    _globalUpdateListenerBound = true;
     window.syns.onUpdateStatus(handleUpdateStatus);
   }
 
-  // Check current state immediately (update may already be found)
+  // Always check current state on login (startup check may have already completed)
   if (window.syns.updateGetState) {
     window.syns
       .updateGetState()
