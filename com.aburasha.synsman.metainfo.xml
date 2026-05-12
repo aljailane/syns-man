@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.aburasha.synsman</id>
+
+  <name>SYNS Man</name>
+  <summary>SSH / SFTP Manager</summary>
+
+  <metadata_license>MIT</metadata_license>
+  <project_license>MIT</project_license>
+
+  <description>
+    <p>
+      SYNS Man is a modern, cross-platform SSH and SFTP manager built with Electron.
+      It lets you manage multiple remote servers from a clean graphical interface —
+      no terminal required for everyday tasks.
+    </p>
+    <ul>
+      <li>SSH terminal with full xterm.js support</li>
+      <li>SFTP file manager: upload, download, delete, rename, chmod</li>
+      <li>In-app file editor with syntax highlighting (CodeMirror)</li>
+      <li>Password and SSH key authentication (id_rsa, id_ed25519, id_ecdsa, *.pem)</li>
+      <li>Encrypted credential storage</li>
+      <li>Multi-color themes: Dark, Light, Ocean, Forest, Violet, Rose</li>
+      <li>In-app changelog fetched live from GitHub</li>
+      <li>Update notifications via GitHub Releases API</li>
+    </ul>
+  </description>
+
+  <url type="homepage">https://aljailane.github.io/syns-man/</url>
+  <url type="bugtracker">https://github.com/aljailane/syns-man/issues</url>
+  <url type="vcs-browser">https://github.com/aljailane/syns-man</url>
+
+  <developer id="com.aburasha">
+    <name>aburasha</name>
+  </developer>
+
+  <launchable type="desktop-id">com.aburasha.synsman.desktop</launchable>
+
+  <categories>
+    <category>Network</category>
+    <category>RemoteAccess</category>
+    <category>FileTransfer</category>
+    <category>Utility</category>
+  </categories>
+
+  <keywords>
+    <keyword>SSH</keyword>
+    <keyword>SFTP</keyword>
+    <keyword>terminal</keyword>
+    <keyword>server</keyword>
+    <keyword>remote</keyword>
+    <keyword>file manager</keyword>
+  </keywords>
+
+  <screenshots>
+    <!-- Add screenshots here before submitting to Flathub -->
+    <!-- Example:
+    <screenshot type="default">
+      <caption>Server manager and SSH terminal</caption>
+      <image>https://raw.githubusercontent.com/aljailane/syns-man/main/docs/screenshots/screenshot-main.png</image>
+    </screenshot>
+    -->
+  </screenshots>
+
+  <releases>
+    <release version="1.0.23" date="2026-05-12">
+      <url type="details">https://github.com/aljailane/syns-man/releases/tag/v1.0.23</url>
+      <description>
+        <ul>
+          <li>Login page redesigned: greeting card with avatar when username is remembered.</li>
+          <li>Password-only input when a username is already saved — no need to retype it.</li>
+          <li>All UI strings are now in English.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="1.0.22" date="2026-05-09">
+      <url type="details">https://github.com/aljailane/syns-man/releases/tag/v1.0.22</url>
+      <description>
+        <ul>
+          <li>SSH key Browse button opens ~/.ssh by default and shows all files including extensionless keys.</li>
+          <li>Selecting a .pub or .ppk file now shows a warning toast.</li>
+          <li>Update notification banner re-appears correctly after login.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="1.0.14" date="2026-05-03">
+      <url type="details">https://github.com/aljailane/syns-man/releases/tag/v1.0.14</url>
+      <description>
+        <ul>
+          <li>Multi-color themes: Ocean, Forest, Violet, Rose.</li>
+          <li>Username is remembered across sessions.</li>
+          <li>Update system overhauled — GitHub API only, no background downloads.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="1.0.0" date="2026-04-29">
+      <url type="details">https://github.com/aljailane/syns-man/releases/tag/v1.0.0</url>
+      <description>
+        <ul>
+          <li>Initial public stable release.</li>
+          <li>Theme toggle (Dark and Light) with persistent preference.</li>
+        </ul>
+      </description>
+    </release>
+  </releases>
+
+  <content_rating type="oars-1.1"/>
+
+  <provides>
+    <binary>syns-man</binary>
+  </provides>
+</component>

@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=SYNS Man
+GenericName=SSH / SFTP Manager
+Comment=Manage remote servers over SSH and SFTP
+Exec=syns-man %U
+Icon=com.aburasha.synsman
+Terminal=false
+Type=Application
+Categories=Network;RemoteAccess;FileTransfer;Utility;
+Keywords=SSH;SFTP;terminal;server;remote;file manager;
+StartupWMClass=syns-man
+StartupNotify=true
+MimeType=
