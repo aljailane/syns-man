@@ -5,6 +5,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.0.23] - 2026-05-12
+
+### Changed
+- Login page redesigned: when username is remembered, shows a greeting card with avatar (first letter) and "Welcome back, [username]" instead of a pre-filled text field.
+- Password field is now the only visible input when a username is already saved — no need to re-enter it each time.
+- Username is saved automatically to `localStorage` after every successful login.
+
+### Fixed
+- Removed Arabic UI strings from the login page (greeting and subtitle are now in English).
+- Removed the "Switch user" button — the app uses a single admin account so the option was misleading.
+
+---
+
 ## [1.0.22] - 2026-05-09
 
 ### Added
