@@ -441,6 +441,71 @@ body.sidebar-resizing #sidebar-resizer::after {
     opacity: 1;
 }
 
+/* ── Auth user badge (remembered user) ── */
+.auth-user-badge {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 18px;
+    margin-bottom: 18px;
+}
+
+.auth-user-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent) 0%, #6366f1 100%);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    letter-spacing: 0;
+    box-shadow: 0 2px 10px rgba(79,142,247,.25);
+}
+
+.auth-user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.auth-user-greeting {
+    font-size: 12px;
+    color: var(--text2);
+    font-weight: 500;
+}
+
+.auth-user-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.auth-switch-link {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--text2);
+    text-decoration: none;
+    flex-shrink: 0;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background .15s, color .15s;
+}
+.auth-switch-link:hover {
+    background: var(--border);
+    color: var(--text);
+}
+
 .form-input::placeholder {
     color: var(--text2);
 }

@@ -153,6 +153,59 @@ function loginPageHTML() {
   let savedUsername = "";
   try { savedUsername = localStorage.getItem("syns_last_username") || ""; } catch {}
   const hasSavedUser = !!savedUsername;
+  const safeUser = savedUsername
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  const avatarLetter = savedUsername ? savedUsername.charAt(0).toUpperCase() : "?";
+
+  const rememberedBlock = `
+    <div class="auth-user-badge">
+      <div class="auth-user-avatar">${avatarLetter}</div>
+      <div class="auth-user-info">
+        <span class="auth-user-greeting">أهلاً،</span>
+        <span class="auth-user-name">${safeUser}</span>
+      </div>
+      <a href="#" id="auth-clear-user" class="auth-switch-link" title="تسجيل الدخول بحساب آخر">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+        تغيير
+      </a>
+    </div>
+    <p class="sub" style="margin-bottom:18px;">أدخل كلمة المرور للمتابعة</p>
+    <div id="login-alert"></div>
+    <form id="login-form">
+      <input type="hidden" id="login-username" value="${safeUser}"/>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" id="login-password" type="password" placeholder="••••••••" autofocus required/>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px;" id="login-btn">
+        Sign In
+      </button>
+    </form>
+    <div class="auth-reset-wrap">
+      <a href="#" id="reset-password-link" class="auth-reset-link">Forgot password? (Reset)</a>
+    </div>`;
+
+  const normalBlock = `
+    <h2>Welcome back</h2>
+    <p class="sub">Sign in to manage your servers.</p>
+    <div id="login-alert"></div>
+    <form id="login-form">
+      <div class="form-group">
+        <label class="form-label">Username</label>
+        <input class="form-input" id="login-username" placeholder="admin" autocomplete="off" required/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" id="login-password" type="password" placeholder="••••••••" required/>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px;" id="login-btn">
+        Sign In
+      </button>
+    </form>
+    <div class="auth-reset-wrap">
+      <a href="#" id="reset-password-link" class="auth-reset-link">Forgot password? (Reset)</a>
+    </div>`;
+
   return `
   <div class="auth-wrap">
     <div class="auth-top-meta">
@@ -168,38 +221,13 @@ function loginPageHTML() {
     <button id="auth-settings-btn" title="Settings" style="position:fixed;left:14px;bottom:14px;width:52px;height:52px;border:none;background:transparent;color:var(--text);cursor:pointer;z-index:6;display:inline-flex;align-items:center;justify-content:center;opacity:.95;">
       ${authSettingsIconHTML()}
     </button>
-    <div style="position:fixed;top:92px;left:50%;transform:translateX(-50%);z-index:4;padding:10px 16px;border-radius:12px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:14px;font-weight:700;box-shadow:var(--shadow);">
-      Welcome back again
-    </div>
     <div class="auth-card">
       <div class="auth-logo">
         <div class="logo-icon">${authLogoHTML()}</div>
         <h1>SYNS Man</h1>
         <p>SSH / SFTP Manager</p>
       </div>
-      <h2>Welcome back</h2>
-      <p class="sub">Sign in to manage your servers.</p>
-      <div id="login-alert"></div>
-      <form id="login-form">
-        <div class="form-group">
-          <label class="form-label">Username</label>
-          <input class="form-input${hasSavedUser ? " auth-prefilled" : ""}" id="login-username" placeholder="admin" autocomplete="off" required value="${savedUsername.replace(/"/g, '&quot;')}"/>
-          ${hasSavedUser ? `<div style="font-size:11px;color:var(--text2);margin-top:4px;display:flex;align-items:center;gap:4px;">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V11H13V17ZM13 9H11V7H13V9Z" fill="currentColor"/></svg>
-            Last session: <b>${savedUsername.replace(/</g, '&lt;')}</b> — <a href="#" id="auth-clear-user" style="color:var(--accent);text-decoration:none;">change</a>
-          </div>` : ""}
-        </div>
-        <div class="form-group">
-          <label class="form-label">Password</label>
-          <input class="form-input" id="login-password" type="password" placeholder="••••••••" required/>
-        </div>
-        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px;" id="login-btn">
-          Sign In
-        </button>
-      </form>
-      <div class="auth-reset-wrap">
-        <a href="#" id="reset-password-link" class="auth-reset-link">Forgot password? (Reset)</a>
-      </div>
+      ${hasSavedUser ? rememberedBlock : normalBlock}
     </div>
     ${authSettingsModalHTML()}
   </div>`;
