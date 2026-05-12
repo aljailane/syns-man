@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.syns.app</id>
+
+  <name>SYNS Man</name>
+  <summary>SSH / SFTP Manager</summary>
+
+  <metadata_license>MIT</metadata_license>
+  <project_license>MIT</project_license>
+
+  <description>
+    <p>
+      SYNS Man is a modern, cross-platform SSH and SFTP manager built with Electron.
+      It lets you manage multiple remote servers from a clean graphical interface —
+      no terminal required for everyday tasks.
+    </p>
+    <ul>
+      <li>SSH terminal with full xterm.js support</li>
+      <li>SFTP file manager: upload, download, delete, rename, chmod</li>
+      <li>In-app file editor with syntax highlighting (CodeMirror)</li>
+      <li>Password and SSH key authentication (id_rsa, id_ed25519, id_ecdsa, *.pem)</li>
+      <li>Encrypted credential storage</li>
+      <li>Multi-color themes: Dark, Light, Ocean, Forest, Violet, Rose</li>
+      <li>In-app changelog fetched live from GitHub</li>
+      <li>Update notifications via GitHub Releases API</li>
+    </ul>
+  </description>
+
+  <url type="homepage">https://aljailane.github.io/syns-man/</url>
+  <url type="bugtracker">https://github.com/aljailane/syns-man/issues</url>
+  <url type="vcs-browser">https://github.com/aljailane/syns-man</url>
+
+  <developer id="com.syns">
+    <name>SYNS Man</name>
+  </developer>
+
+  <categories>
+    <category>Network</category>
+    <category>RemoteAccess</category>
+    <category>FileTransfer</category>
+    <category>Utility</category>
+  </categories>
+
+  <keywords>
+    <keyword>SSH</keyword>
+    <keyword>SFTP</keyword>
+    <keyword>terminal</keyword>
+    <keyword>server</keyword>
+    <keyword>remote</keyword>
+    <keyword>file manager</keyword>
+  </keywords>
+
+  <launchable type="desktop-id">com.syns.app.desktop</launchable>
+
+  <provides>
+    <binary>syns-man</binary>
+  </provides>
+
+  <releases>
+    <release version="1.0.23" date="2026-05-12">
+      <description>
+        <ul>
+          <li>Login page redesigned: greeting card with avatar when username is remembered.</li>
+          <li>Password-only input when a username is already saved.</li>
+          <li>Removed Arabic UI strings; all labels are now in English.</li>
+          <li>Removed misleading switch-user button (single admin account app).</li>
+        </ul>
+      </description>
+    </release>
+    <release version="1.0.22" date="2026-05-09">
+      <description>
+        <ul>
+          <li>SSH key Browse button opens ~/.ssh by default and shows all files including extensionless keys.</li>
+          <li>Selecting a .pub or .ppk file now shows a warning toast.</li>
+          <li>Update notification banner re-appears correctly after login.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="1.0.21" date="2026-05-09">
+      <description>
+        <ul>
+          <li>Removed deprecated electron-builder fields that caused schema validation errors.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="1.0.20" date="2026-05-09">
+      <description>
+        <ul>
+          <li>Removed macOS support. Build targets are now Linux and Windows only.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="1.0.14" date="2026-05-03">
+      <description>
+        <ul>
+          <li>Multi-color themes: Ocean, Forest, Violet, Rose.</li>
+          <li>Remember username across sessions.</li>
+          <li>Update system overhauled — GitHub API only, no background downloads.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="1.0.0" date="2026-04-29">
+      <description>
+        <ul>
+          <li>Initial public stable release.</li>
+          <li>Theme toggle (Dark and Light) with persistent preference.</li>
+          <li>About page with Overview and Changelog tabs.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.9.0" date="2026-04-15">
+      <description>
+        <ul>
+          <li>SFTP file manager with upload, download, delete, rename, chmod.</li>
+          <li>In-app file editor with CodeMirror and syntax highlighting.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.5.0" date="2026-03-28">
+      <description>
+        <ul>
+          <li>Initial release with SSH terminal, server manager, and encrypted credentials.</li>
+        </ul>
+      </description>
+    </release>
+  </releases>
+
+  <content_rating type="oars-1.1"/>
+</component>
