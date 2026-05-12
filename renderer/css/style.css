@@ -491,20 +491,7 @@ body.sidebar-resizing #sidebar-resizer::after {
     white-space: nowrap;
 }
 
-.auth-switch-link {
-    margin-left: auto;
-    font-size: 12px;
-    color: var(--text2);
-    text-decoration: none;
-    flex-shrink: 0;
-    padding: 4px 8px;
-    border-radius: 6px;
-    transition: background .15s, color .15s;
-}
-.auth-switch-link:hover {
-    background: var(--border);
-    color: var(--text);
-}
+
 
 .form-input::placeholder {
     color: var(--text2);

@@ -161,15 +161,11 @@ function loginPageHTML() {
     <div class="auth-user-badge">
       <div class="auth-user-avatar">${avatarLetter}</div>
       <div class="auth-user-info">
-        <span class="auth-user-greeting">أهلاً،</span>
+        <span class="auth-user-greeting">Welcome back,</span>
         <span class="auth-user-name">${safeUser}</span>
       </div>
-      <a href="#" id="auth-clear-user" class="auth-switch-link" title="تسجيل الدخول بحساب آخر">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
-        تغيير
-      </a>
     </div>
-    <p class="sub" style="margin-bottom:18px;">أدخل كلمة المرور للمتابعة</p>
+    <p class="sub" style="margin-bottom:18px;">Enter your password to continue.</p>
     <div id="login-alert"></div>
     <form id="login-form">
       <input type="hidden" id="login-username" value="${safeUser}"/>

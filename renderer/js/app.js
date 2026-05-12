@@ -593,13 +593,6 @@ function bindSetupForm() {
 }
 
 function bindLoginForm() {
-  // "change" link to clear saved username
-  document.getElementById("auth-clear-user")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    try { localStorage.removeItem("syns_last_username"); } catch {}
-    showAuthPage("login");
-  });
-
   document
     .getElementById("login-form")
     .addEventListener("submit", async (e) => {
