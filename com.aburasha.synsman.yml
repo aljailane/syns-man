@@ -16,14 +16,15 @@ finish-args:
   - --device=dri
   # Network: SSH/SFTP connections + GitHub update check
   - --share=network
-  # Home directory: read SSH keys from ~/.ssh, app data
+  # SSH keys (read-only); SFTP upload/download requires home access
+  - --filesystem=~/.ssh:ro
   - --filesystem=home
   # System notifications (update banner)
   - --talk-name=org.freedesktop.Notifications
   # System tray (optional)
   - --talk-name=org.kde.StatusNotifierWatcher
-  # Allow opening URLs in the default browser
-  - --talk-name=org.freedesktop.portal.OpenURI
+  # Allow opening URLs in the default browser (portal bus name, not interface)
+  - --talk-name=org.freedesktop.portal.Desktop
 
 modules:
   - name: syns-man
@@ -31,8 +32,10 @@ modules:
 
     build-commands:
       # Make AppImage executable and extract it
-      - chmod +x SYNS.Man-1.0.23.AppImage
-      - ./SYNS.Man-1.0.23.AppImage --appimage-extract
+      - |
+          APPIMAGE="SYNS.Man-1.0.23.AppImage"
+          chmod +x "$APPIMAGE"
+          ./"$APPIMAGE" --appimage-extract
 
       # Install extracted app
       - mkdir -p /app/lib/syns-man
@@ -65,14 +68,16 @@ modules:
           /app/share/icons/hicolor/512x512/apps/com.aburasha.synsman.png
 
     sources:
-      # Pre-built AppImage from GitHub Releases
-      # After each new release, update the URL and sha256:
-      #   wget -O SYNS.Man-X.Y.Z.AppImage "https://github.com/aljailane/syns-man/releases/download/vX.Y.Z/SYNS.Man-X.Y.Z.AppImage"
-      #   sha256sum SYNS.Man-X.Y.Z.AppImage
       - type: file
         url: https://github.com/aljailane/syns-man/releases/download/v1.0.23/SYNS.Man-1.0.23.AppImage
         sha256: 8a9655c78767458de08ad036e3646d087ee3f01daad21549a23e62e4d35c8e72
         dest-filename: SYNS.Man-1.0.23.AppImage
+        x-checker-data:
+          type: json
+          url: https://api.github.com/repos/aljailane/syns-man/releases/latest
+          version-query: .tag_name | ltrimstr("v")
+          url-query: >-
+            .assets[] | select(.name | test("^SYNS\\.Man-.*\\.AppImage$")) | .browser_download_url
 
       # Launcher script: runs the app through the base-app Electron binary
       - type: script
