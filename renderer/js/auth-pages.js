@@ -161,7 +161,7 @@ function loginPageHTML() {
     <div class="auth-user-badge">
       <div class="auth-user-avatar">${avatarLetter}</div>
       <div class="auth-user-info">
-        <span class="auth-user-greeting">Welcome back,</span>
+        <span class="auth-user-greeting">Hi,</span>
         <span class="auth-user-name">${safeUser}</span>
       </div>
     </div>
@@ -182,7 +182,7 @@ function loginPageHTML() {
     </div>`;
 
   const normalBlock = `
-    <h2>Welcome back</h2>
+    <h2>Hi</h2>
     <p class="sub">Sign in to manage your servers.</p>
     <div id="login-alert"></div>
     <form id="login-form">
